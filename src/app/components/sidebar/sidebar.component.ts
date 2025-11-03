@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
+import { AuthService } from '../../services/auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -10,7 +11,8 @@ import { Router } from '@angular/router';
 })
 export class SidebarComponent {
   constructor (
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   sendToHome(event: Event) {
@@ -33,7 +35,7 @@ export class SidebarComponent {
     this.router.navigate(['dashboard/generate-permission']);
   }
 
-  sendToDocentes(event: Event) { // 👈 corregido
+  sendToDocentes(event: Event) { 
     event.preventDefault();
     this.router.navigate(['dashboard/docentes']);
   }
@@ -41,5 +43,13 @@ export class SidebarComponent {
   sendToHistorial(event: Event) {
     event.preventDefault();
     this.router.navigate(['dashboard/historial']);
+  }
+
+  logout(event: Event) {
+    event.preventDefault();
+
+    if(confirm("¿Estas seguro de que deseas cerrar sesión?")) {
+      this.authService.logout();
+    }
   }
 }
