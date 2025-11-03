@@ -1,0 +1,41 @@
+<div class="relative min-h-screen bg-cover bg-center" style="background-image: url('assets/FondoLogin.png');">
+    
+    <div class="relative z-10 flex flex-col items-end justify-center min-h-screen pr-40">
+        <div class="flex flex-col items-center">
+            <h1 class="text-4xl font-extrabold text-[#1B5A85] mb-4">BIENVENIDO</h1>
+
+            
+            <div class="flex items-center justify-center w-72 my-10 text-gray-300 text-sm font-semibold">
+                <hr class="flex-1 border-gray-400" />
+                <span class="mx-2">inicia sesión con tu usuario</span>
+                <hr class="flex-1 border-gray-400" />
+            </div>
+
+            <form class="w-72 flex flex-col">
+                
+                <div class="mb-10 flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-3 py-2">
+                    <i class="fa fa-user text-white mr-2"></i>
+                    <input type="text" placeholder="Usuario"
+                        class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+                </div>
+
+                <div class="mb-10 flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-3 py-2">
+                    <i class="fa fa-lock text-white mr-2"></i>
+                    <input type="password" placeholder="Contraseña"
+                        class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+                </div>
+
+                <button type="submit"
+                    class="mt-2 bg-[#1B5A85] hover:bg-[#164865] text-white font-extrabold rounded-2xl py-3 transition-colors">
+                    ACCEDER
+                </button>
+
+                <p class="text-center text-sm text-black mt-4">
+                    ¿No tienes cuenta?
+                    <a (click)="sendToRegister($event)" class="text-[#1B5A85] hover:text-[#164865] font-semibold hover:underline">Crea una
+                        aquí</a>
+                </p>
+            </form>
+        </div>
+    </div>
+</div>

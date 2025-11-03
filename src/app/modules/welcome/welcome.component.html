@@ -1,0 +1,107 @@
+<!-- Importar Boxicons -->
+<link href='https://unpkg.com/boxicons@2.1.1/css/boxicons.min.css' rel='stylesheet'>
+
+<!-- Contenedor principal -->
+<main class="ml-72 mt-[5%] mr-8 font-[Poppins,sans-serif]">
+
+  <!-- Bienvenida -->
+  <section class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">Bienvenido Ali</h1>
+  </section>
+
+  <!-- Datos del alumno -->
+  <section class="flex items-center justify-between bg-white rounded-xl shadow-md p-4 mb-8">
+    <table class="text-gray-700 font-medium">
+      <thead>
+        <tr class="border-b">
+          <th class="px-6 py-2">Nombre</th>
+          <th class="px-6 py-2">A.P</th>
+          <th class="px-6 py-2">A.M</th>
+          <th class="px-6 py-2">Matrícula</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td class="px-6 py-2">Ali</td>
+          <td class="px-6 py-2">Lopez</td>
+          <td class="px-6 py-2">Zunun</td>
+          <td class="px-6 py-2">233335</td>
+        </tr>
+      </tbody>
+    </table>
+    <button (click)="sentTopermisos($event)" class="bg-[#a3c1c9] text-white font-medium px-4 py-2 rounded-lg shadow hover:bg-[#8fb3b9] transition">
+      Nuevo Permiso
+    </button>
+  </section>
+
+  <!-- Historial -->
+  <section class="bg-white rounded-2xl shadow-lg p-6 relative">
+    <div class="flex items-center justify-between mb-4">
+      <div class="flex items-center gap-2">
+        <i class='bx bx-history text-2xl text-[#a3c1c9]'></i>
+        <h2 class="text-[#003D6B] font-semibold text-lg">Historial</h2>
+      </div>
+      <span class="text-gray-600 text-sm font-medium">26 de Junio del 2025</span>
+    </div>
+
+    <!-- Tabla de permisos -->
+    <div class="overflow-x-auto">
+      <table class="min-w-full border-collapse overflow-hidden rounded-xl">
+        <thead class="bg-[#a3c1c9] text-white">
+          <tr>
+            <th class="text-left py-3 px-4">Matrícula</th>
+            <th class="text-left py-3 px-4">Nombre</th>
+            <th class="text-left py-3 px-4">Apellido P</th>
+            <th class="text-left py-3 px-4">Apellido M</th>
+            <th class="text-left py-3 px-4">Permisos</th>
+            <th class="text-left py-3 px-4">Fecha</th>
+            <th class="text-left py-3 px-4">Asunto</th>
+            <th class="text-center py-3 px-4">Evidencia</th>
+          </tr>
+        </thead>
+
+        <tbody class="text-gray-700">
+          <tr class="border-b hover:bg-[#f1f7fc] transition">
+            <td class="py-3 px-4">233335</td>
+            <td class="py-3 px-4">Ali</td>
+            <td class="py-3 px-4">Lopez</td>
+            <td class="py-3 px-4">Zunun</td>
+            <td class="py-3 px-4">3</td>
+            <td class="py-3 px-4">Junio</td>
+            <td class="py-3 px-4">Personal</td>
+            <td class="text-center text-white rounded-r-xl">
+              <i class='bx bxs-file-pdf text-[#ff3c3c] text-2xl hover:scale-110 transition-transform cursor-pointer'></i>
+            </td>
+          </tr>
+
+          <tr class="border-b hover:bg-[#f1f7fc] transition">
+            <td class="py-3 px-4">233339</td>
+            <td class="py-3 px-4">Daniel</td>
+            <td class="py-3 px-4">Perez</td>
+            <td class="py-3 px-4">Toledo</td>
+            <td class="py-3 px-4">4</td>
+            <td class="py-3 px-4">Marzo</td>
+            <td class="py-3 px-4">Otro</td>
+            <td class="text-center text-white rounded-r-xl">
+              <i class='bx bxs-file-pdf text-[#ff3c3c] text-2xl hover:scale-110 transition-transform cursor-pointer'></i>
+            </td>
+          </tr>
+
+          <tr>
+            <td class="py-3 px-4">233325</td>
+            <td class="py-3 px-4">David</td>
+            <td class="py-3 px-4">Chanona</td>
+            <td class="py-3 px-4">Mendez</td>
+            <td class="py-3 px-4">1</td>
+            <td class="py-3 px-4">Mayo</td>
+            <td class="py-3 px-4">Salud</td>
+            <td class="text-center text-white rounded-r-xl">
+              <i class='bx bxs-file-pdf text-[#ff3c3c] text-2xl hover:scale-110 transition-transform cursor-pointer'></i>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+</main>

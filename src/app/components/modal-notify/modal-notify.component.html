@@ -1,0 +1,40 @@
+<div *ngIf="visible"
+     class="absolute top-0 right-0 mt-16 mr-6 w-[360px] bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-200 animate-slide-left z-50">
+
+  <!-- Encabezado -->
+  <div class="flex justify-between items-center mb-4">
+    <h2 class="text-lg font-semibold text-gray-800">Notificaciones</h2>
+    <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+      &times;
+    </button>
+  </div>
+
+  <!-- Icono de aprobación -->
+  <div class="flex justify-center mb-6">
+    <div class="bg-green-100 p-4 rounded-full border-4 border-green-500">
+      <svg xmlns="http://www.w3.org/2000/svg"
+           class="h-12 w-12 text-green-600"
+           fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+  </div>
+
+  <!-- Mensaje -->
+  <p class="text-gray-700 text-lg mb-6">Tu solicitud ha sido aprobada</p>
+
+  <!-- Botón Descargar -->
+  <button
+    (click)="descargarPDF()"
+    class="flex items-center justify-center mx-auto bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg px-5 py-2 shadow-md transition-all">
+    Descargar
+    <svg xmlns="http://www.w3.org/2000/svg"
+         class="h-5 w-5 ml-2"
+         viewBox="0 0 24 24"
+         fill="currentColor">
+      <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm8 2v2H4v-2h16z" />
+    </svg>
+    <span class="ml-1 text-xs bg-pink-500 text-white px-1.5 py-0.5 rounded">PDF</span>
+  </button>
+</div>

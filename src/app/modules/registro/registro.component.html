@@ -1,0 +1,80 @@
+<div class="relative min-h-screen bg-cover bg-center" style="background-image: url('assets/FondoLogin.png');">
+  <div class="relative z-10 flex flex-col items-end justify-center min-h-screen pr-40">
+    <div class="flex flex-col items-center">
+      <h1 class="text-4xl font-extrabold text-[#1B5A85] mb-2">REGISTER</h1>
+      <p class="text-xs text-gray-700 mb-10 font-semibold">or log in with username</p>
+
+      <form class="grid grid-cols-2 gap-x-8 gap-y-12 w-full max-w-2xl">
+
+        <!-- Campos normales -->
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-user text-white mr-3 text-lg'></i>
+          <input type="text" placeholder="First name"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-user text-white mr-3 text-lg'></i>
+          <input type="text" placeholder="Second name (opcional)"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-user text-white mr-3 text-lg'></i>
+          <input type="text" placeholder="First surname"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-user text-white mr-3 text-lg'></i>
+          <input type="text" placeholder="Second surname"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-envelope text-white mr-3 text-lg'></i>
+          <input type="email" placeholder="Email"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4">
+          <i class='bx bx-phone text-white mr-3 text-lg'></i>
+          <input type="tel" placeholder="Phone"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold" />
+        </div>
+
+        <!-- Campo Contraseña -->
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4 relative">
+          <i class='bx bx-lock text-white mr-3 text-lg'></i>
+          <input [type]="isPasswordVisible ? 'text' : 'password'" placeholder="Contraseña"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold pr-8" />
+          <i 
+            class='bx text-white text-xl absolute right-4 cursor-pointer'
+            [ngClass]="isPasswordVisible ? 'bx-hide' : 'bx-show'"
+            (click)="togglePasswordVisibility()">
+          </i>
+        </div>
+
+        <!-- Campo Confirmar Contraseña -->
+        <div class="flex items-center bg-[#97BEC6] bg-opacity-70 rounded-xl px-5 py-4 relative">
+          <i class='bx bx-lock text-white mr-3 text-lg'></i>
+          <input [type]="isConfirmPasswordVisible ? 'text' : 'password'" placeholder="Confirme la contraseña"
+            class="bg-transparent text-white placeholder-white outline-none w-full font-semibold pr-8" />
+          <i 
+            class='bx text-white text-xl absolute right-4 cursor-pointer'
+            [ngClass]="isConfirmPasswordVisible ? 'bx-hide' : 'bx-show'"
+            (click)="toggleConfirmPasswordVisibility()">
+          </i>
+        </div>
+
+        <!-- Botón -->
+        <div class="col-span-2 flex justify-center mt-8">
+          <button type="submit"
+            class="bg-[#1B5A85] hover:bg-[#164865] text-white font-extrabold rounded-2xl px-16 py-3 transition-colors">
+            REGISTRAR
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,55 @@
+<aside class="sidebar fixed top-[5%] left-4 flex flex-col h-[92vh] bg-[#003D6B] text-white w-60 rounded-[30px] shadow-2xl z-50 overflow-hidden">
+    <div class="flex items-center justify-center py-5 border-b border-[#002A4D]">
+        <div class="w-16 h-16 bg-white rounded-full overflow-hidden flex items-center justify-center p-2">
+            <img src="/assets/logo.png" alt="Logo" class="w-full h-full object-contain">
+        </div>
+    </div>
+
+    <nav class="flex-1 py-3 overflow-y-auto">
+        <ul class="space-y-0">
+            <li>
+                <a (click)="sendToHome($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-home text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Inicio</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="sendToTutorados($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-group text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Tutorados</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="sendToEvidences($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-briefcase text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Evidencias</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="sendToPermissions($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-file text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Permisos</span>
+                </a>
+            </li>
+            <li>
+                <a href="#" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-user text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Docentes</span>
+                </a>
+            </li>
+            <li>
+                <a (click)="sendToHistorial($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                    <i class='bx bx-file text-xl mr-3'></i>
+                    <span class="font-medium text-sm">Historial</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <div class="border-t border-[#002A4D]">
+        <a href="#" class="flex items-center px-6 py-4 hover:bg-[#004A7F] transition-colors cursor-pointer">
+            <i class='bx bx-log-out text-xl mr-3'></i>
+            <span class="font-medium text-sm">Salir</span>
+        </a>
+    </div>
+</aside>

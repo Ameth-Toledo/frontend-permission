@@ -1,0 +1,115 @@
+<div
+  class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-start pt-12 z-50"
+  *ngIf="isVisible"
+>
+  <div class="bg-white rounded-2xl shadow-2xl w-4/5 md:w-2/3 lg:w-1/2 p-6 relative">
+    <!-- Título -->
+    <h2 class="text-2xl font-semibold mb-4 text-gray-900">
+      Editar Docente
+    </h2>
+
+    <!-- Formulario -->
+    <form (ngSubmit)="guardarDocente()" class="space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Nombre(s)</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.nombre"
+            name="nombre"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Apellido P</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.apellidoP"
+            name="apellidoP"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Apellido M</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.apellidoM"
+            name="apellidoM"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Correo Gmail</label>
+          <input
+            type="email"
+            [(ngModel)]="docente.correo"
+            name="correo"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+            required
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Número</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.numero"
+            name="numero"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          />
+        </div>
+
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-1">Cuatrimestre</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.cuatrimestre"
+            name="cuatrimestre"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          />
+        </div>
+
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Materia</label>
+          <input
+            type="text"
+            [(ngModel)]="docente.materia"
+            name="materia"
+            class="block w-full h-12 px-3 rounded-lg border border-gray-300 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200"
+          />
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex justify-end gap-3 mt-4">
+        <button
+          type="button"
+          class="px-5 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium transition"
+          (click)="cerrar.emit()"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="px-5 py-2 rounded-lg bg-blue-500 hover:bg-blue-600 text-white font-semibold transition"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+
+    <!-- Botón cerrar (X) -->
+    <button
+      class="absolute top-3 right-3 text-gray-500 hover:text-gray-700 transition text-2xl font-bold"
+      (click)="cerrar.emit()"
+    >
+      ×
+    </button>
+  </div>
+</div>

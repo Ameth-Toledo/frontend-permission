@@ -1,0 +1,118 @@
+<div class="min-h-screen bg-gray-50 p-6">
+  <!-- Botón flotante -->
+  <div class="fixed top-40 right-16 z-10">
+    <button
+      class="bg-orange-400 hover:bg-orange-500 text-white rounded-full w-14 h-14 flex items-center justify-center text-2xl font-bold shadow-lg transition-all"
+      (click)="abrirModal()"
+      title="Añadir Profesor"
+    >
+      +
+    </button>
+  </div>
+
+  <div class="max-w-7xl mx-auto" style="margin-top: 150px;">
+    <div class="bg-white rounded-2xl shadow-lg overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead class="text-white" style="background-color: #97BEC6;">
+            <tr>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bx-user text-lg'></i> Nombre(s)
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bx-id-card text-lg'></i> Apellido P
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bx-id-card text-lg'></i> Apellido M
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bxl-gmail text-lg text-red-500'></i> Correo Gmail
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bxl-whatsapp text-lg text-green-600'></i> Num
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bx-calendar text-lg text-blue-700'></i> Cuatrimestre
+                </span>
+              </th>
+              <th class="px-4 py-3 text-left text-sm font-semibold">
+                <span class="inline-flex items-center gap-2">
+                  <i class='bx bx-book-open text-lg text-indigo-700'></i> Materia
+                </span>
+              </th>
+              <th class="px-4 py-3 text-center text-sm font-semibold">
+                <span class="inline-flex items-center gap-2 justify-center">
+                  <i class='bx bx-cog text-lg'></i> Acciones
+                </span>
+              </th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let docente of docentes; let i = index" class="border-b border-gray-200 hover:bg-gray-50 transition-colors" [class.bg-gray-50]="i % 2 === 0">
+              <td class="px-4 py-3 text-sm text-gray-900 font-medium">{{ docente.nombre }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ docente.apellidoP }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ docente.apellidoM }}</td>
+              <td class="px-4 py-3 text-sm text-blue-600">{{ docente.correo }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ docente.numero }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ docente.cuatrimestre }}</td>
+              <td class="px-4 py-3 text-sm text-gray-900">{{ docente.materia }}</td>
+              <td class="px-4 py-3 text-sm text-center flex items-center justify-center gap-3">
+                <button class="text-blue-600 hover:text-blue-800 transition" title="Editar docente" (click)="abrirEditModal(docente)">
+                  <i class='bx bx-edit-alt text-2xl'></i>
+                </button>
+                <button class="text-red-500 hover:text-red-700 transition" title="Eliminar docente" (click)="confirmarEliminacion(docente)">
+                  <i class='bx bx-trash-alt text-2xl'></i>
+                </button>
+              </td>
+            </tr>
+
+            <tr *ngIf="docentes.length === 0">
+              <td colspan="8" class="px-6 py-12 text-center text-gray-500">
+                <div class="flex flex-col items-center gap-3">
+                  <i class='bx bx-user-plus text-6xl text-gray-300'></i>
+                  <p class="text-lg font-medium">No hay profesores registrados</p>
+                  <p class="text-sm">No se encontraron registros</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modales -->
+  <app-modal-docente
+    [isVisible]="isModalVisible"
+    (cerrar)="cerrarModal()"
+    (guardar)="guardarDocente($event)">
+  </app-modal-docente>
+
+  <!-- Modal de edición -->
+  <app-modal-aviso
+    *ngIf="docenteParaEditar"
+    [isVisible]="isEditModalVisible"
+    [docente]="docenteParaEditar"
+    (cerrar)="cerrarEditModal()"
+    (guardar)="actualizarDocente($event)">
+  </app-modal-aviso>
+
+  <app-modal-alert
+    [isVisible]="isAlertVisible"
+    [docente]="docenteSeleccionado"
+    (cerrar)="cerrarAlerta()"
+    (confirmar)="eliminarDocenteConfirmado()">
+  </app-modal-alert>
+</div>

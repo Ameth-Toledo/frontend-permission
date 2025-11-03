@@ -1,0 +1,141 @@
+<div
+  class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+  *ngIf="isVisible"
+>
+  <div class="bg-white rounded-2xl shadow-2xl w-[750px] p-8 relative">
+    <h2 class="text-left text-2xl font-bold mb-6 text-gray-900">
+      Añadir profesor
+    </h2>
+
+    <form (ngSubmit)="guardarDocente()" class="grid grid-cols-2 gap-x-8 gap-y-5">
+      <!-- Columna izquierda -->
+      <div>
+        <!-- Nombre -->
+        <label class="block text-sm font-normal text-gray-900 mb-2">
+          Nombre:
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoDocente.nombre"
+          name="nombre"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <!-- Apellido P -->
+        <label class="block text-sm font-normal text-gray-900 mt-5 mb-2">
+          Apellido P:
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoDocente.apellidoP"
+          name="apellidoP"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <!-- Apellido M -->
+        <label class="block text-sm font-normal text-gray-900 mt-5 mb-2">
+          Apellido M:
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoDocente.apellidoM"
+          name="apellidoM"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <!-- Número de teléfono -->
+        <label class="block text-sm font-normal text-gray-900 mt-5 mb-2">
+          Número de teléfono:
+        </label>
+        <input
+          type="tel"
+          [(ngModel)]="nuevoDocente.numero"
+          name="numero"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      <!-- Columna derecha -->
+      <div>
+        <!-- Correo Institucional -->
+        <label class="block text-sm font-normal text-gray-900 mb-2">
+          Correo institucional:
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="nuevoDocente.correo"
+          name="correo"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+
+        <!-- Cuatrimestre asignado -->
+        <label class="block text-sm font-normal text-gray-900 mt-5 mb-2">
+          Cuatrimestre asignado:
+        </label>
+        <select
+          [(ngModel)]="nuevoDocente.cuatrimestre"
+          name="cuatrimestre"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+          style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.5em 1.5em; padding-right: 2.5rem;"
+        >
+          <option value="" disabled selected></option>
+          <option value="1">1° Cuatrimestre</option>
+          <option value="2">2° Cuatrimestre</option>
+          <option value="3">3° Cuatrimestre</option>
+          <option value="4">4° Cuatrimestre</option>
+          <option value="5">5° Cuatrimestre</option>
+          <option value="6">6° Cuatrimestre</option>
+          <option value="7">7° Cuatrimestre</option>
+          <option value="8">8° Cuatrimestre</option>
+          <option value="9">9° Cuatrimestre</option>
+          <option value="10">10° Cuatrimestre</option>
+        </select>
+
+        <!-- Materia -->
+        <label class="block text-sm font-normal text-gray-900 mt-5 mb-2">
+          Materia:
+        </label>
+        <select
+          [(ngModel)]="nuevoDocente.materia"
+          name="materia"
+          required
+          class="w-full border-2 border-gray-900 rounded-md p-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 appearance-none bg-white"
+          style="background-image: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 24 24%27 fill=%27none%27 stroke=%27currentColor%27 stroke-width=%272%27 stroke-linecap=%27round%27 stroke-linejoin=%27round%27%3e%3cpolyline points=%276 9 12 15 18 9%27%3e%3c/polyline%3e%3c/svg%3e'); background-repeat: no-repeat; background-position: right 0.5rem center; background-size: 1.5em 1.5em; padding-right: 2.5rem;"
+        >
+          <option value="" disabled selected></option>
+          <option value="Matemáticas">Matemáticas</option>
+          <option value="Programación">Programación</option>
+          <option value="Base de Datos">Base de Datos</option>
+          <option value="Redes">Redes</option>
+          <option value="Desarrollo Web">Desarrollo Web</option>
+          <option value="Ingeniería de Software">Ingeniería de Software</option>
+          <option value="Sistemas Operativos">Sistemas Operativos</option>
+          <option value="Estructuras de Datos">Estructuras de Datos</option>
+        </select>
+      </div>
+
+      <!-- Botones -->
+      <div class="col-span-2 flex justify-center gap-6 mt-6">
+        <button
+          type="button"
+          (click)="cerrarModal()"
+          class="bg-red-300 text-white font-semibold px-12 py-2.5 rounded-lg hover:bg-red-400 transition text-base"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="bg-green-400 text-white font-semibold px-12 py-2.5 rounded-lg hover:bg-green-500 transition text-base"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,117 @@
+<div class="w-full px-4 sm:px-6 lg:px-8 py-4 sm:py-6 mt-16 sm:mt-20 lg:mt-32 max-w-7xl mx-auto">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 lg:gap-12">
+        <div class="lg:col-span-2 w-full lg:-ml-10">            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 mb-6 sm:mb-8">
+                <div class="w-full">
+                    <label for="fecha-inicial" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">Fecha:</label>
+                    <input type="date" id="fecha-inicial"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                </div>
+                <div class="w-full">
+                    <label for="fecha-final" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">Fecha final:</label>
+                    <input type="date" id="fecha-final"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 lg:gap-12 mb-6 sm:mb-8">
+                <div class="w-full">
+                    <label for="motivo" class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">Motivo:</label>
+                    <select id="motivo"
+                        class="w-full px-3 sm:px-4 py-2 sm:py-2.5 text-sm sm:text-base border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white cursor-pointer">
+                        <option value="familiares">Familiares</option>
+                        <option value="salud">Salud</option>
+                        <option value="economicos">Económicos</option>
+                        <option value="eventos-academicos">Eventos Académicos</option>
+                        <option value="deportivos">Deportivos</option>
+                        <option value="embarazo">Embarazo</option>
+                        <option value="accidentes">Accidentes</option>
+                        <option value="adicciones">Adicciones</option>
+                        <option value="tramites-personales" selected>Trámites Personales</option>
+                        <option value="otro">Otro</option>
+                    </select>
+                </div>
+                <div class="w-full">
+                    <label class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">Evidencias:</label>
+                    <a href="assets/pdf_example/pdf_example.pdf" target="_blank"
+                        class="inline-flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors w-full sm:w-auto">
+                        <svg class="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 text-red-600" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8l-6-6zm4 18H6V4h7v5h5v11z" />
+                            <path d="M8 15h8v2H8zm0-4h8v2H8zm0-4h5v2H8z" />
+                        </svg>
+                        <span class="text-xs sm:text-sm text-gray-700 font-medium truncate">pdf_example.pdf</span>
+                    </a>
+                </div>
+            </div>
+            <div class="w-full">
+                <label class="block text-sm sm:text-base font-semibold text-gray-800 mb-2 sm:mb-3">Docentes:</label>
+                <div class="space-y-0 border border-gray-200 rounded-lg overflow-hidden bg-white">
+                    <label class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-200 transition-colors">
+                        <input type="checkbox" class="w-4 h-4 flex-shrink-0 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm sm:text-base text-gray-800">Marcelo Álvarez Hernández</span>
+                    </label>
+                    <label class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 cursor-pointer border-b border-gray-200 transition-colors">
+                        <input type="checkbox" checked class="w-4 h-4 flex-shrink-0 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm sm:text-base text-gray-800 font-medium">Sirgei Garcia Bailindas</span>
+                    </label>
+                    <label class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-gray-50 cursor-pointer border-b border-gray-200 transition-colors">
+                        <input type="checkbox" class="w-4 h-4 flex-shrink-0 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm sm:text-base text-gray-800">Jose Pablo Vazquez Cruz</span>
+                    </label>
+                    <label class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 bg-blue-50 cursor-pointer border-b border-gray-200 transition-colors">
+                        <input type="checkbox" checked class="w-4 h-4 flex-shrink-0 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm sm:text-base text-gray-800 font-medium">Diana Beatriz Vazquez Cruz</span>
+                    </label>
+                    <label class="flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 hover:bg-gray-50 cursor-pointer transition-colors">
+                        <input type="checkbox" class="w-4 h-4 flex-shrink-0 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
+                        <span class="text-sm sm:text-base text-gray-800">Alonso Guadalupe Hernandez Mendoza</span>
+                    </label>
+                </div>
+            </div>
+
+        </div>
+        <div class="lg:col-span-1 w-full mt-6 lg:mt-0">
+            <div class="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 lg:p-6 shadow-sm lg:sticky lg:top-20">
+                <div class="text-center pb-3 sm:pb-4 border-b border-gray-200">
+                    <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Matrícula</p>
+                    <p class="text-2xl sm:text-3xl font-bold text-gray-900">233335</p>
+                </div>
+
+                <div class="py-3 sm:py-4 space-y-2">
+                    <div>
+                        <p class="text-xs text-gray-500 uppercase tracking-wide mb-1">Nombre completo</p>
+                        <p class="text-base sm:text-lg font-semibold text-gray-800 break-words">Alejandro Toledo Perez</p>
+                    </div>
+                </div>
+
+                <div class="pt-3 sm:pt-4 border-t border-gray-200 space-y-2 sm:space-y-3">
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 bg-green-100 rounded-full flex items-center justify-center">
+                            <i class='bx bxl-whatsapp text-xl sm:text-2xl text-green-600'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs text-gray-500 mb-0.5">WhatsApp</p>
+                            <p class="text-sm font-medium text-gray-800">966-45-53-35</p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center gap-2 sm:gap-3">
+                        <div class="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 bg-red-100 rounded-full flex items-center justify-center">
+                            <i class='bx bx-envelope text-xl sm:text-2xl text-red-600'></i>
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <p class="text-xs text-gray-500 mb-0.5">Correo institucional</p>
+                            <p class="text-xs font-medium text-gray-800 break-all leading-relaxed">233335&#64;ids.upchiapas.edu.mx</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-4 sm:pt-6">
+                    <button type="submit"
+                        class="w-full py-2.5 sm:py-3 bg-blue-600 text-white text-sm sm:text-base font-semibold rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors shadow-md hover:shadow-lg">
+                        Generar Permiso
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

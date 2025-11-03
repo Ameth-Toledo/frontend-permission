@@ -1,0 +1,130 @@
+<div
+  class="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50"
+  *ngIf="isVisible"
+>
+  <div class="bg-white rounded-2xl shadow-2xl w-[750px] p-8 relative">
+    <h2 class="text-left text-xl font-semibold mb-6 text-gray-900">
+      Añadir Alumno
+    </h2>
+
+    <form (ngSubmit)="guardarAlumno()" class="grid grid-cols-2 gap-x-8 gap-y-4">
+      <!-- Columna izquierda -->
+      <div>
+        <!-- 1 -->
+        <label class="block text-sm font-semibold text-gray-700 mb-1">
+          Nombre <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoAlumno.nombre"
+          name="nombre"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 2 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Segundo Nombre <span class="text-gray-400 text-xs">(Opcional)</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoAlumno.segundoNombre"
+          name="segundoNombre"
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 3 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Apellido Paterno <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoAlumno.apellidoP"
+          name="apellidoP"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 4 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Apellido Materno <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoAlumno.apellidoM"
+          name="apellidoM"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
+
+      <!-- Columna derecha -->
+      <div>
+        <!-- 5 -->
+        <label class="block text-sm font-semibold text-gray-700 mb-1">
+          Matrícula <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          [(ngModel)]="nuevoAlumno.matricula"
+          name="matricula"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 6 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Correo electrónico <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="email"
+          [(ngModel)]="nuevoAlumno.correo"
+          name="correo"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 7 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Número de teléfono <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          [(ngModel)]="nuevoAlumno.telefono"
+          name="telefono"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+
+        <!-- 8 -->
+        <label class="block text-sm font-semibold text-gray-700 mt-4 mb-1">
+          Número de tutor familiar <span class="text-red-500">*</span>
+        </label>
+        <input
+          type="tel"
+          [(ngModel)]="nuevoAlumno.tutor"
+          name="tutor"
+          required
+          class="w-full border border-gray-300 rounded-lg p-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+        />
+      </div>
+
+      <!-- Botones -->
+      <div class="col-span-2 flex justify-center gap-6 mt-8">
+        <button
+          type="button"
+          (click)="cerrarModal()"
+          class="bg-red-400 text-white font-semibold px-6 py-2 rounded-lg hover:bg-red-500 transition"
+        >
+          Cancelar
+        </button>
+        <button
+          type="submit"
+          class="bg-green-500 text-white font-semibold px-6 py-2 rounded-lg hover:bg-green-600 transition"
+        >
+          Guardar
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
