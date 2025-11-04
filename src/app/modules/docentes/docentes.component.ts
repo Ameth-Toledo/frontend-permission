@@ -1,90 +1,109 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ModalDocenteComponent } from '../../components/modal-docente/modal-docente.component';
-import { ModalAlertComponent } from '../../components/modal-alert/modal-alert.component';
-import { ModalAvisoComponent } from '../../components/modal-aviso/modal-aviso.component';
 import { TitleService } from '../../services/title/title.service';
 
-interface Docente {
-  nombre: string;
-  apellidoP: string;
-  apellidoM: string;
-  correo: string;
-  numero: string;
-  cuatrimestre: string;
-  materia: string;
+interface Teacher {
+  teacherId: number;
+  userId: number;
+  informacionPersonal: {
+    nombreCompleto: string;
+    email: string;
+    telefono: string;
+  };
+  informacionRol: {
+    nombreRol: string;
+    descripcion: string;
+  };
+  fechaRegistro: string;
 }
 
 @Component({
   selector: 'app-docentes',
   standalone: true,
-  imports: [CommonModule, ModalDocenteComponent, ModalAlertComponent, ModalAvisoComponent],
+  imports: [CommonModule],
   templateUrl: './docentes.component.html',
 })
 export class DocentesComponent implements OnInit {
-  isModalVisible = false;          // Modal para agregar
-  isAlertVisible = false;          // Modal de alerta/eliminar
-  isEditModalVisible = false;      // Modal de edición
-  docenteSeleccionado: Docente | null = null;  // Para eliminar
-  docenteParaEditar: Docente | null = null;    // Para editar
+  constructor(private titleService: TitleService) { }
 
-  docentes: Docente[] = [
-    { nombre: 'Ali', apellidoP: 'Lopez', apellidoM: 'Zunun', correo: 'ali.lopez@upchiapas.edu.mx', numero: '9661155544', cuatrimestre: '5', materia: 'Programación' },
-    { nombre: 'Eduardo', apellidoP: 'Toledo', apellidoM: 'Perez', correo: 'eduardo.toledo@upchiapas.edu.mx', numero: '9661155549', cuatrimestre: '3', materia: 'Base de Datos' },
-    { nombre: 'Daniel', apellidoP: 'Chanona', apellidoM: 'Castro', correo: 'daniel.chanona@upchiapas.edu.mx', numero: '9661155355', cuatrimestre: '7', materia: 'Redes' },
-  ];
-
-  constructor(private titleService: TitleService) {}
+  teachers: Teacher[] = [];
+  total: number = 0;
 
   ngOnInit() {
+    this.loadTeachers();
     this.titleService.setTitle('Docentes');
-    this.titleService.setSearch(false);
   }
 
-  // Abrir modal de agregar
-  abrirModal() {
-    this.isModalVisible = true;
-  }
-  cerrarModal() {
-    this.isModalVisible = false;
-  }
-  guardarDocente(docente: Docente) {
-    this.docentes.push(docente);
-    this.cerrarModal();
+  loadTeachers() {
+    // Reemplaza esto con tu llamada al servicio
+    const data = {
+      teachers: [
+        {
+          teacherId: 4,
+          userId: 9,
+          informacionPersonal: {
+            nombreCompleto: "Carlos Alberto Diaz Hernandez",
+            email: "cvdiaz@ids.upchiapas.edu.mx",
+            telefono: "9611234567"
+          },
+          informacionRol: {
+            nombreRol: "Tutor",
+            descripcion: "User in charge of approving or rejecting student permits"
+          },
+          fechaRegistro: "2025-11-03T16:47:58"
+        },
+        {
+          teacherId: 3,
+          userId: 6,
+          informacionPersonal: {
+            nombreCompleto: "Karla Melissa Corral Zarate",
+            email: "233313@ids.upchiapas.edu.mx",
+            telefono: "9613037813"
+          },
+          informacionRol: {
+            nombreRol: "Teacher",
+            descripcion: "Professor in charge of registering or validating student attendance"
+          },
+          fechaRegistro: "2025-10-31T00:25:12"
+        },
+        {
+          teacherId: 2,
+          userId: 5,
+          informacionPersonal: {
+            nombreCompleto: "Sujey  Calderon Martinez",
+            email: "233291@ids.upchiapas.edu.mx",
+            telefono: "9613037813"
+          },
+          informacionRol: {
+            nombreRol: "Teacher",
+            descripcion: "Professor in charge of registering or validating student attendance"
+          },
+          fechaRegistro: "2025-10-31T00:20:21"
+        },
+        {
+          teacherId: 1,
+          userId: 3,
+          informacionPersonal: {
+            nombreCompleto: "Sayuri Estefania Zuñiga Chacon",
+            email: "233349@ids.upchiapas.edu.mx",
+            telefono: "9613037813"
+          },
+          informacionRol: {
+            nombreRol: "Teacher",
+            descripcion: "Professor in charge of registering or validating student attendance"
+          },
+          fechaRegistro: "2025-10-29T20:17:10"
+        }
+      ],
+      total: 4
+    };
+
+    this.teachers = data.teachers;
+    this.total = data.total;
   }
 
-  // Abrir modal de edición
-  abrirEditModal(docente: Docente) {
-    this.docenteParaEditar = { ...docente }; // clonamos para no modificar directamente
-    this.isEditModalVisible = true;
-  }
-  cerrarEditModal() {
-    this.isEditModalVisible = false;
-    this.docenteParaEditar = null;
-  }
-  actualizarDocente(docenteActualizado: Docente) {
-    if (this.docenteParaEditar) {
-      const index = this.docentes.findIndex(d => d === this.docenteParaEditar);
-      if (index > -1) {
-        this.docentes[index] = docenteActualizado;
-      }
-    }
-    this.cerrarEditModal();
-  }
-
-  // Abrir modal de eliminar
-  confirmarEliminacion(docente: Docente) {
-    this.docenteSeleccionado = docente;
-    this.isAlertVisible = true;
-  }
-  cerrarAlerta() {
-    this.isAlertVisible = false;
-  }
-  eliminarDocenteConfirmado() {
-    if (this.docenteSeleccionado) {
-      this.docentes = this.docentes.filter(d => d !== this.docenteSeleccionado);
-      this.docenteSeleccionado = null;
-    }
-    this.cerrarAlerta();
+  verDetalle(teacher: Teacher) {
+    console.log('Ver detalle del docente:', teacher);
+    // Implementa aquí la lógica para ver el detalle
   }
 }

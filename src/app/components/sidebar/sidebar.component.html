@@ -19,12 +19,12 @@
                     <span class="font-medium text-sm">Tutorados</span>
                 </a>
             </li>
-            <li>
+            <!--<li>
                 <a (click)="sendToEvidences($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-briefcase text-xl mr-3'></i>
                     <span class="font-medium text-sm">Evidencias</span>
                 </a>
-            </li>
+            </li>-->
             <li>
                 <a (click)="sendToPermissions($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-file text-xl mr-3'></i>
@@ -32,7 +32,7 @@
                 </a>
             </li>
             <li>
-                <a href="#" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToDocentes($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-user text-xl mr-3'></i>
                     <span class="font-medium text-sm">Docentes</span>
                 </a>

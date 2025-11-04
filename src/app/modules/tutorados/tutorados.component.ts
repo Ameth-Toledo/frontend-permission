@@ -1,75 +1,108 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TitleService } from '../../services/title/title.service';
-import { ModalTutoradoComponent } from '../../components/modal-tutorado/modal-tutorado.component';
 
-interface Alumno {
+interface Student {
+  studentId: number;
   matricula: string;
-  nombre: string;
-  segundoNombre?: string;  // ← Agregado como opcional
-  apellidoP: string;
-  apellidoM: string;
-  correo: string;
-  telefono: string;
-  tutor: string;
+  telefonoTutorFamiliar: string | null;
+  userId: number;
+  tutorId: number | null;
+  informacionPersonal: {
+    nombreCompleto: string;
+    email: string;
+    telefono: string | null;
+  };
+  informacionRol: {
+    nombreRol: string;
+    descripcion: string;
+  };
+  fechaRegistro: string;
 }
 
 @Component({
   selector: 'app-tutorados',
   standalone: true,
-  imports: [CommonModule, ModalTutoradoComponent],
+  imports: [CommonModule],
   templateUrl: './tutorados.component.html',
   styleUrls: ['./tutorados.component.css']
 })
 export class TutoradosComponent implements OnInit {
-  alumnos: Alumno[] = [
-    {
-      matricula: '233335',
-      nombre: 'Ali',
-      apellidoP: 'Lopez',
-      apellidoM: 'Zunun',
-      correo: '233335@lds.upchiapas.edu.mx',
-      telefono: '9661155544',
-      tutor: '966449933'
-    },
-    {
-      matricula: '233335',
-      nombre: 'Eduardo',
-      apellidoP: 'Toledo',
-      apellidoM: 'Perez',
-      correo: '233333@lds.upchiapas.edu.mx',
-      telefono: '9661155549',
-      tutor: '966449939'
-    },
-    {
-      matricula: '233335',
-      nombre: 'Daniel',
-      apellidoP: 'Chanona',
-      apellidoM: 'Castro',
-      correo: '233355@lds.upchiapas.edu.mx',
-      telefono: '9661155355',
-      tutor: '966444533'
-    }
-  ];
-  
-  isModalVisible = false;
-
-  abrirModal() {
-    this.isModalVisible = true;
-  }
-
-  cerrarModal() {
-    this.isModalVisible = false;
-  }
-
-  guardarAlumno(nuevoAlumno: Alumno) {
-    this.alumnos.push(nuevoAlumno);
-    this.cerrarModal();
-  }
+  students: Student[] = [];
+  total: number = 0;
 
   constructor(private titleService: TitleService) { }
   
   ngOnInit() {
     this.titleService.setTitle('Tutorados');
+    this.loadStudents();
+  }
+
+  loadStudents() {
+    // Reemplaza esto con tu llamada al servicio
+    const data = {
+      students: [
+        {
+          studentId: 3,
+          matricula: "",
+          telefonoTutorFamiliar: null,
+          userId: 8,
+          tutorId: null,
+          informacionPersonal: {
+            nombreCompleto: "JORED666  GitHub",
+            email: "243842@ids.upchiapas.edu.mx",
+            telefono: null
+          },
+          informacionRol: {
+            nombreRol: "Student",
+            descripcion: "User who can request school absence permits"
+          },
+          fechaRegistro: "2025-11-03T15:27:06"
+        },
+        {
+          studentId: 2,
+          matricula: "",
+          telefonoTutorFamiliar: null,
+          userId: 4,
+          tutorId: null,
+          informacionPersonal: {
+            nombreCompleto: "Victor Fabricio Perez Constantino",
+            email: "233394@ids.upchiapas.edu.mx",
+            telefono: "9613037813"
+          },
+          informacionRol: {
+            nombreRol: "Student",
+            descripcion: "User who can request school absence permits"
+          },
+          fechaRegistro: "2025-10-29T22:14:42"
+        },
+        {
+          studentId: 1,
+          matricula: "233363",
+          telefonoTutorFamiliar: "9611234567",
+          userId: 1,
+          tutorId: 1,
+          informacionPersonal: {
+            nombreCompleto: "Ameth de Jesus Mendez Toledo",
+            email: "233363@ids.upchiapas.edu.mx",
+            telefono: "9613037813"
+          },
+          informacionRol: {
+            nombreRol: "Student",
+            descripcion: "User who can request school absence permits"
+          },
+          fechaRegistro: "2025-10-28T18:56:43"
+        }
+      ],
+      total: 3
+    };
+
+    this.students = data.students;
+    this.total = data.total;
+  }
+
+  verDetalle(student: Student) {
+    console.log('Ver detalle del estudiante:', student);
+    // Implementa aquí la lógica para ver el detalle o abrir el modal
   }
 }

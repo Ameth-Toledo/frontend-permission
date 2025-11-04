@@ -19,7 +19,7 @@ export const routes: Routes = [
     { path: '', component: Login },
     { path: 'registro', component: RegistroComponent },
     { path: 'auth/callback', component: AuthCallbackComponent },
-    { path: 'dashboard', redirectTo: 'welcome', component: DashboardComponent, /*canActivate: [authGuard],*/ children: [
+    { path: 'dashboard', component: DashboardComponent, /*canActivate: [authGuard],*/ children: [
         { path: 'permission', component: PermissionComponent },
         { path: 'generate-permission', component: GeneratePermissionComponent },
         { path: 'tutorados', component: TutoradosComponent },
