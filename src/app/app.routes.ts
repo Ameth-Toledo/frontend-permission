@@ -11,6 +11,7 @@ import { RegistroComponent } from './modules/registro/registro.component';
 import { HistorialComponent } from './modules/historial/historial.component';
 import { PermitionDetailComponent } from './modules/permition-detail/permition-detail.component';
 import { AuthCallbackComponent } from './modules/auth-callback/auth-callback.component';
+import { PermissionComponent } from './modules/permission/permission.component';
 
 
 export const routes: Routes = [
@@ -18,7 +19,8 @@ export const routes: Routes = [
     { path: '', component: Login },
     { path: 'registro', component: RegistroComponent },
     { path: 'auth/callback', component: AuthCallbackComponent },
-    { path: 'dashboard', component: DashboardComponent, /*canActivate: [authGuard],*/ children: [
+    { path: 'dashboard', redirectTo: 'welcome', component: DashboardComponent, /*canActivate: [authGuard],*/ children: [
+        { path: 'permission', component: PermissionComponent },
         { path: 'generate-permission', component: GeneratePermissionComponent },
         { path: 'tutorados', component: TutoradosComponent },
         { path: 'evidencias', component: Evidencias },

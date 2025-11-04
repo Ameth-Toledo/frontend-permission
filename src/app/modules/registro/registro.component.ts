@@ -22,7 +22,7 @@ export class RegistroComponent {
     email: '',
     phone: '',
     password: '',
-    roleId: 1
+    roleId: 0
   };
 
   confirmPassword: string = '';
@@ -61,11 +61,12 @@ export class RegistroComponent {
     this.usersService.register(this.userData).subscribe({
       next: (response) => {
         console.log('Registro exitoso', response);
+        alert('Registro exitoso. Ahora puedes iniciar sesión.');
         this.router.navigate(['']);
       },
       error: (error) => {
         this.isLoading = false;
-        this.errorMessage = error.error?.message || 'Error al registrarse';
+        this.errorMessage = error.error?.error || error.error?.message || 'Error al registrarse';
         console.error('Error en registro:', error);
       },
       complete: () => {
@@ -78,6 +79,11 @@ export class RegistroComponent {
     if (!this.userData.firstName || !this.userData.lastName || 
         !this.userData.email || !this.userData.phone || !this.userData.password) {
       this.errorMessage = 'Por favor completa todos los campos obligatorios';
+      return false;
+    }
+
+    if (!this.userData.email.endsWith('@ids.upchiapas.edu.mx')) {
+      this.errorMessage = 'Debes usar una cuenta institucional (@ids.upchiapas.edu.mx)';
       return false;
     }
 

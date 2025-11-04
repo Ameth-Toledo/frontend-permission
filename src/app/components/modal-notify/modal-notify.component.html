@@ -1,40 +1,89 @@
 <div *ngIf="visible"
-     class="absolute top-0 right-0 mt-16 mr-6 w-[360px] bg-white rounded-2xl shadow-xl p-8 text-center border border-gray-200 animate-slide-left z-50">
+     class="absolute top-0 right-0 mt-16 mr-6 w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-200 animate-slide-left z-50 max-h-[600px] overflow-hidden flex flex-col">
 
   <!-- Encabezado -->
-  <div class="flex justify-between items-center mb-4">
-    <h2 class="text-lg font-semibold text-gray-800">Notificaciones</h2>
-    <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-xl leading-none">
+  <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
+    <h2 class="text-lg font-bold text-gray-800">Notificaciones</h2>
+    <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
       &times;
     </button>
   </div>
 
-  <!-- Icono de aprobación -->
-  <div class="flex justify-center mb-6">
-    <div class="bg-green-100 p-4 rounded-full border-4 border-green-500">
-      <svg xmlns="http://www.w3.org/2000/svg"
-           class="h-12 w-12 text-green-600"
-           fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-              d="M5 13l4 4L19 7" />
-      </svg>
+  <!-- Lista de notificaciones -->
+  <div class="overflow-y-auto flex-1">
+    <div *ngIf="notifications.length === 0" class="p-8 text-center text-gray-500">
+      <i class='bx bx-bell-off text-5xl mb-2'></i>
+      <p>No tienes notificaciones</p>
+    </div>
+
+    <div *ngFor="let notification of notifications" 
+         class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+         [class.bg-blue-50]="!notification.leido"
+         (click)="handleNotificationClick(notification)">
+      
+      <div class="flex items-start gap-3">
+        <!-- Icono según tipo -->
+        <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
+             [ngClass]="{
+               'bg-green-100': notification.tipo === 'approved',
+               'bg-red-100': notification.tipo === 'rejected',
+               'bg-blue-100': notification.tipo === 'new_permit',
+               'bg-yellow-100': notification.tipo === 'pending'
+             }">
+          <i class="text-xl"
+             [ngClass]="{
+               'bx bx-check text-green-600': notification.tipo === 'approved',
+               'bx bx-x text-red-600': notification.tipo === 'rejected',
+               'bx bx-file text-blue-600': notification.tipo === 'new_permit',
+               'bx bx-time text-yellow-600': notification.tipo === 'pending'
+             }"></i>
+        </div>
+
+        <!-- Contenido -->
+        <div class="flex-1 min-w-0">
+          <p class="text-sm font-medium text-gray-900 mb-1">
+            {{ notification.mensaje }}
+          </p>
+          <p class="text-xs text-gray-500">
+            {{ formatDate(notification.fechaCreacion) }}
+          </p>
+        </div>
+
+        <!-- Indicador de no leído -->
+        <div *ngIf="!notification.leido" class="flex-shrink-0">
+          <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
+        </div>
+      </div>
+
+      <!-- Botones de acción según tipo -->
+      <div *ngIf="notification.tipo === 'approved' && !notification.leido" 
+           class="mt-3 flex gap-2">
+        <button
+          (click)="descargarPDF(notification); $event.stopPropagation()"
+          class="flex-1 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg px-4 py-2 text-sm shadow-md transition-all">
+          <i class='bx bx-download mr-2'></i>
+          Descargar PDF
+        </button>
+      </div>
+
+      <div *ngIf="notification.tipo === 'new_permit' && !notification.leido" 
+           class="mt-3 flex gap-2">
+        <button
+          (click)="verPermiso(notification); $event.stopPropagation()"
+          class="flex-1 flex items-center justify-center bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg px-4 py-2 text-sm shadow-md transition-all">
+          <i class='bx bx-show mr-2'></i>
+          Ver Permiso
+        </button>
+      </div>
     </div>
   </div>
 
-  <!-- Mensaje -->
-  <p class="text-gray-700 text-lg mb-6">Tu solicitud ha sido aprobada</p>
-
-  <!-- Botón Descargar -->
-  <button
-    (click)="descargarPDF()"
-    class="flex items-center justify-center mx-auto bg-blue-500 hover:bg-blue-600 text-white font-medium rounded-lg px-5 py-2 shadow-md transition-all">
-    Descargar
-    <svg xmlns="http://www.w3.org/2000/svg"
-         class="h-5 w-5 ml-2"
-         viewBox="0 0 24 24"
-         fill="currentColor">
-      <path d="M12 16l4-5h-3V4h-2v7H8l4 5zm8 2v2H4v-2h16z" />
-    </svg>
-    <span class="ml-1 text-xs bg-pink-500 text-white px-1.5 py-0.5 rounded">PDF</span>
-  </button>
+  <!-- Footer -->
+  <div class="p-3 border-t border-gray-200 bg-gray-50 text-center">
+    <button 
+      (click)="marcarTodasComoLeidas()"
+      class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+      Marcar todas como leídas
+    </button>
+  </div>
 </div>

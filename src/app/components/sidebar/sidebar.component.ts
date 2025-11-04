@@ -32,7 +32,7 @@ export class SidebarComponent {
 
   sendToPermissions(event: Event) {
     event.preventDefault();
-    this.router.navigate(['dashboard/generate-permission']);
+    this.router.navigate(['dashboard/permission']);
   }
 
   sendToDocentes(event: Event) { 

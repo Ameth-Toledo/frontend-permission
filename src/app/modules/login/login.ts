@@ -34,8 +34,30 @@ export class Login implements OnInit {
     }
 
     this.route.queryParams.subscribe(params => {
-      if (params['error'] === 'authentication_failed') {
-        this.errorMessage = 'Error al autenticar con el proveedor externo';
+      if (params['error']) {
+        switch(params['error']) {
+          case 'invalid_institutional_email':
+            this.errorMessage = 'Debes usar una cuenta institucional (@ids.upchiapas.edu.mx)';
+            break;
+          case 'authentication_failed':
+          case 'auth_failed':
+            this.errorMessage = 'Error al autenticar con el proveedor externo';
+            break;
+          case 'google_auth_failed':
+            this.errorMessage = 'Error al autenticar con Google';
+            break;
+          case 'github_auth_failed':
+            this.errorMessage = 'Error al autenticar con GitHub';
+            break;
+          case 'no_code':
+            this.errorMessage = 'No se recibió código de autorización';
+            break;
+          case 'no_email':
+            this.errorMessage = 'No se pudo obtener el correo electrónico';
+            break;
+          default:
+            this.errorMessage = 'Error desconocido al iniciar sesión';
+        }
       }
     });
   }
@@ -48,6 +70,11 @@ export class Login implements OnInit {
   onLogin() {
     if (!this.credentials.email || !this.credentials.password) {
       this.errorMessage = 'Por favor completa todos los campos';
+      return;
+    }
+
+    if (!this.credentials.email.endsWith('@ids.upchiapas.edu.mx')) {
+      this.errorMessage = 'Debes usar una cuenta institucional (@ids.upchiapas.edu.mx)';
       return;
     }
 
