@@ -1,174 +1,195 @@
-<div class="mt-4" *ngIf="permiso">
-    <div class="rounded-lg overflow-hidden">
-        <div class="p-6">
-            <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                <div class="flex items-center gap-3">
-                    <span class="text-gray-600 font-semibold">Estado:</span>
-                    <span [ngClass]="getStatusClass()" class="px-3 py-1 rounded-full text-sm font-semibold">
-                        {{ getStatusText() }}
-                    </span>
-                </div>
-
-                <div class="flex gap-3">
-                    <button
-                        class="group relative text-white py-3 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
-                        style="background-color: #003D6B;" onmouseover="this.style.backgroundColor='#002a4a'"
-                        onmouseout="this.style.backgroundColor='#003D6B'">
-                        <div
-                            class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300">
-                        </div>
-                        <i class='bx bx-check-circle text-2xl relative z-10'></i>
-                        <span class="font-semibold text-base relative z-10">Aprobar</span>
-                    </button>
-                    <button
-                        class="group relative text-white py-3 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
-                        style="background-color: #F25F61;" onmouseover="this.style.backgroundColor='#d94446'"
-                        onmouseout="this.style.backgroundColor='#F25F61'">
-                        <div
-                            class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300">
-                        </div>
-                        <i class='bx bx-x-circle text-2xl relative z-10'></i>
-                        <span class="font-semibold text-base relative z-10">Rechazar</span>
-                    </button>
-                </div>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div class="space-y-6">
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class='bx bxs-user-circle text-2xl text-blue-600'></i>
-                            Estudiante
-                        </h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Nombre:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.estudiante.nombreCompleto }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Matrícula:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.estudiante.numeroMatricula }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Email:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.estudiante.email }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Teléfono:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.estudiante.telefono }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class='bx bxs-user-badge text-2xl text-green-600'></i>
-                            Tutor
-                        </h3>
-                        <div class="space-y-2 text-sm">
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Nombre:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.tutor.nombreCompleto }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Email:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.tutor.email }}</span>
-                            </div>
-                            <div class="flex">
-                                <span class="text-gray-600 w-32">Teléfono:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.tutor.telefono }}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class='bx bxs-group text-2xl text-purple-600'></i>
-                            Profesores
-                        </h3>
-                        <div class="max-h-64 overflow-y-auto pr-2 space-y-2">
-                            <div *ngFor="let profesor of permiso.profesores"
-                                class="bg-gray-50 hover:bg-gray-100 rounded-lg p-3 transition-colors duration-200 border border-gray-200">
-                                <div class="flex items-start gap-3">
-                                    <div
-                                        class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
-                                        <i class='bx bxs-user text-purple-600 text-xl'></i>
-                                    </div>
-                                    <div class="flex-1 min-w-0">
-                                        <div class="font-medium text-gray-800 text-sm truncate">{{
-                                            profesor.nombreCompleto }}</div>
-                                        <div class="text-xs text-gray-600 truncate">{{ profesor.email }}</div>
-                                        <div class="text-xs text-gray-600">{{ profesor.telefono }}</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="mt-2 text-xs text-gray-500 text-center">
-                            Total: {{ permiso.profesores.length }} profesor(es)
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-6">
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                            <i class='bx bxs-info-circle text-2xl text-orange-600'></i>
-                            Detalles del Permiso
-                        </h3>
-                        <div class="space-y-3 text-sm">
-                            <div>
-                                <span class="text-gray-600 block mb-1">Motivo:</span>
-                                <span class="text-gray-800 font-medium">{{ permiso.reason }}</span>
-                            </div>
-                            <div>
-                                <span class="text-gray-600 block mb-1">Descripción:</span>
-                                <p class="text-gray-800 bg-gray-50 rounded p-2">{{ permiso.description }}</p>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <span class="text-gray-600 block mb-1">Fecha Inicio:</span>
-                                    <span class="text-gray-800 font-medium">{{ permiso.startDate | date:'dd/MM/yyyy'
-                                        }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600 block mb-1">Fecha Fin:</span>
-                                    <span class="text-gray-800 font-medium">{{ permiso.endDate | date:'dd/MM/yyyy'
-                                        }}</span>
-                                </div>
-                            </div>
-                            <div class="grid grid-cols-2 gap-3">
-                                <div>
-                                    <span class="text-gray-600 block mb-1">Cuatrimestre:</span>
-                                    <span class="text-gray-800 font-medium">{{ permiso.cuatrimestre }}</span>
-                                </div>
-                                <div>
-                                    <span class="text-gray-600 block mb-1">Fecha Solicitud:</span>
-                                    <span class="text-gray-800 font-medium">{{ permiso.requestDate | date:'dd/MM/yyyy'
-                                        }}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="border rounded-lg p-4">
-                        <h3 class="text-lg font-semibold text-gray-800 mb-3">
-                            Evidencia
-                        </h3>
-                        <div class="flex items-center justify-start">
-                            <button (click)="openEvidence()"
-                                class="flex flex-row items-center gap-3 hover:opacity-80 transition-opacity">
-                                <img src="assets/icon/image.png" alt="PDF" class="w-20 h-20 object-contain">
-                                <span class="text-sm text-blue-600 font-medium hover:underline">Ver Documento PDF</span>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<!-- Loading State -->
+<div *ngIf="isLoading" class="mt-4 text-center py-12 bg-white rounded-lg shadow">
+  <i class='bx bx-loader-alt bx-spin text-5xl text-blue-600'></i>
+  <p class="mt-4 text-gray-600 font-medium">Cargando detalles del permiso...</p>
 </div>
 
-<div *ngIf="!permiso" class="mt-4 text-center py-8 text-gray-500">
-    <i class='bx bx-loader-alt bx-spin text-4xl'></i>
-    <p class="mt-2">Cargando información del permiso...</p>
+<!-- Error State -->
+<div *ngIf="errorMessage && !isLoading" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+  <i class='bx bx-error-circle text-4xl text-red-500'></i>
+  <p class="mt-2 text-red-700 font-medium">{{ errorMessage }}</p>
+  <button (click)="goBack()"
+    class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+    Volver a la lista
+  </button>
+</div>
+
+<!-- Permit Details -->
+<div class="mt-4" *ngIf="permiso && !isLoading">
+  <!-- Botón de regresar -->
+  <div class="mb-4">
+    <button (click)="goBack()"
+      class="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors">
+      <i class='bx bx-arrow-back text-xl'></i>
+      <span>Volver a la lista</span>
+    </button>
+  </div>
+
+  <div class="rounded-lg overflow-hidden">
+    <div class="p-6">
+      <div class="mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div class="flex items-center gap-3">
+          <span class="text-gray-600 font-semibold">Estado:</span>
+          <span [ngClass]="getStatusClass()" class="px-3 py-1 rounded-full text-sm font-semibold">
+            {{ getStatusText() }}
+          </span>
+        </div>
+
+        <div class="flex gap-3">
+          <button
+            class="group relative text-white py-3 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
+            style="background-color: #003D6B;" 
+            onmouseover="this.style.backgroundColor='#002a4a'"
+            onmouseout="this.style.backgroundColor='#003D6B'">
+            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+            <i class='bx bx-check-circle text-2xl relative z-10'></i>
+            <span class="font-semibold text-base relative z-10">Aprobar</span>
+          </button>
+          <button
+            class="group relative text-white py-3 px-8 rounded-xl transition-all duration-300 flex items-center gap-3 shadow-lg hover:shadow-2xl transform hover:-translate-y-1 overflow-hidden"
+            style="background-color: #F25F61;" 
+            onmouseover="this.style.backgroundColor='#d94446'"
+            onmouseout="this.style.backgroundColor='#F25F61'">
+            <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity duration-300"></div>
+            <i class='bx bx-x-circle text-2xl relative z-10'></i>
+            <span class="font-semibold text-base relative z-10">Rechazar</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Columna izquierda -->
+        <div class="space-y-6">
+          <!-- Estudiante -->
+          <div class="border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <i class='bx bxs-user-circle text-2xl text-blue-600'></i>
+              Estudiante
+            </h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex">
+                <span class="text-gray-600 w-32">Nombre:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.estudiante.nombreCompleto }}</span>
+              </div>
+              <div class="flex">
+                <span class="text-gray-600 w-32">Matrícula:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.estudiante.numeroMatricula }}</span>
+              </div>
+              <div class="flex">
+                <span class="text-gray-600 w-32">Email:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.estudiante.email }}</span>
+              </div>
+              <div class="flex">
+                <span class="text-gray-600 w-32">Teléfono:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.estudiante.telefono }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Tutor -->
+          <div class="border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <i class='bx bxs-user-badge text-2xl text-green-600'></i>
+              Tutor
+            </h3>
+            <div class="space-y-2 text-sm">
+              <div class="flex">
+                <span class="text-gray-600 w-32">Nombre:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.tutor.nombreCompleto }}</span>
+              </div>
+              <div class="flex">
+                <span class="text-gray-600 w-32">Email:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.tutor.email }}</span>
+              </div>
+              <div class="flex">
+                <span class="text-gray-600 w-32">Teléfono:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.tutor.telefono }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Profesores -->
+          <div class="border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <i class='bx bxs-group text-2xl text-purple-600'></i>
+              Profesores
+            </h3>
+            <div class="max-h-64 overflow-y-auto pr-2 space-y-2">
+              <div *ngFor="let profesor of permiso.profesores"
+                class="bg-gray-50 hover:bg-gray-100 rounded-lg p-3 transition-colors duration-200 border border-gray-200">
+                <div class="flex items-start gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center">
+                    <i class='bx bxs-user text-purple-600 text-xl'></i>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <div class="font-medium text-gray-800 text-sm truncate">{{ profesor.nombreCompleto }}</div>
+                    <div class="text-xs text-gray-600 truncate">{{ profesor.email }}</div>
+                    <div class="text-xs text-gray-600">{{ profesor.telefono }}</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="mt-2 text-xs text-gray-500 text-center">
+              Total: {{ permiso.profesores.length }} profesor(es)
+            </div>
+          </div>
+        </div>
+
+        <!-- Columna derecha -->
+        <div class="space-y-6">
+          <!-- Detalles del Permiso -->
+          <div class="border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3 flex items-center gap-2">
+              <i class='bx bxs-info-circle text-2xl text-orange-600'></i>
+              Detalles del Permiso
+            </h3>
+            <div class="space-y-3 text-sm">
+              <div>
+                <span class="text-gray-600 block mb-1">Motivo:</span>
+                <span class="text-gray-800 font-medium">{{ permiso.reason }}</span>
+              </div>
+              <div>
+                <span class="text-gray-600 block mb-1">Descripción:</span>
+                <p class="text-gray-800 bg-gray-50 rounded p-2">{{ permiso.description }}</p>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <span class="text-gray-600 block mb-1">Fecha Inicio:</span>
+                  <span class="text-gray-800 font-medium">{{ permiso.startDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-600 block mb-1">Fecha Fin:</span>
+                  <span class="text-gray-800 font-medium">{{ permiso.endDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+              <div class="grid grid-cols-2 gap-3">
+                <div>
+                  <span class="text-gray-600 block mb-1">Cuatrimestre:</span>
+                  <span class="text-gray-800 font-medium">{{ permiso.cuatrimestre }}</span>
+                </div>
+                <div>
+                  <span class="text-gray-600 block mb-1">Fecha Solicitud:</span>
+                  <span class="text-gray-800 font-medium">{{ permiso.requestDate | date:'dd/MM/yyyy' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Evidencia -->
+          <div class="border rounded-lg p-4">
+            <h3 class="text-lg font-semibold text-gray-800 mb-3">
+              Evidencia
+            </h3>
+            <div class="flex items-center justify-start">
+              <button (click)="openEvidence()"
+                class="flex flex-row items-center gap-3 hover:opacity-80 transition-opacity">
+                <img src="assets/icon/image.png" alt="PDF" class="w-20 h-20 object-contain">
+                <span class="text-sm text-blue-600 font-medium hover:underline">Ver Documento PDF</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

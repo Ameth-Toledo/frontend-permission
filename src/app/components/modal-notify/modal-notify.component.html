@@ -1,17 +1,22 @@
 <div *ngIf="visible"
      class="absolute top-0 right-0 mt-16 mr-6 w-[400px] bg-white rounded-2xl shadow-2xl border border-gray-200 animate-slide-left z-50 max-h-[600px] overflow-hidden flex flex-col">
-
-  <!-- Encabezado -->
   <div class="flex justify-between items-center p-4 border-b border-gray-200 bg-gray-50">
-    <h2 class="text-lg font-bold text-gray-800">Notificaciones</h2>
-    <button (click)="cerrarModal()" class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
+    <h2 class="text-lg font-bold text-gray-800">
+      Notificaciones
+      <span *ngIf="hasUnreadNotifications()" 
+            class="ml-2 text-xs bg-red-500 text-white px-2 py-1 rounded-full">
+        {{ getUnreadCount() }}
+      </span>
+    </h2>
+    <button (click)="cerrarModal()" 
+            class="text-gray-400 hover:text-gray-600 text-2xl leading-none">
       &times;
     </button>
   </div>
 
-  <!-- Lista de notificaciones -->
   <div class="overflow-y-auto flex-1">
-    <div *ngIf="notifications.length === 0" class="p-8 text-center text-gray-500">
+    <div *ngIf="notifications.length === 0" 
+         class="p-8 text-center text-gray-500">
       <i class='bx bx-bell-off text-5xl mb-2'></i>
       <p>No tienes notificaciones</p>
     </div>
@@ -22,7 +27,6 @@
          (click)="handleNotificationClick(notification)">
       
       <div class="flex items-start gap-3">
-        <!-- Icono según tipo -->
         <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
              [ngClass]="{
                'bg-green-100': notification.tipo === 'approved',
@@ -39,23 +43,51 @@
              }"></i>
         </div>
 
-        <!-- Contenido -->
         <div class="flex-1 min-w-0">
-          <p class="text-sm font-medium text-gray-900 mb-1">
+          <div class="mb-1" *ngIf="notification.informacionRemitente">
+            <p class="text-sm font-semibold text-gray-900">
+              {{ getNombreRemitente(notification) }}
+            </p>
+            <p class="text-xs text-gray-500" *ngIf="getEmailRemitente(notification)">
+              {{ getEmailRemitente(notification) }}
+            </p>
+          </div>
+
+          <p class="text-sm text-gray-700 mb-1">
             {{ notification.mensaje }}
           </p>
-          <p class="text-xs text-gray-500">
+
+          <div *ngIf="notification.informacionPermiso" 
+               class="mt-2 text-xs bg-gray-100 p-2 rounded">
+            <p class="text-gray-600">
+              <span class="font-semibold">Permiso #{{ notification.informacionPermiso.permitId }}</span>
+            </p>
+            <p class="text-gray-600">
+              📝 {{ notification.informacionPermiso.motivo }}
+            </p>
+            <p class="text-gray-600">
+              Estado: 
+              <span class="font-medium"
+                    [ngClass]="{
+                      'text-green-600': notification.informacionPermiso.estado === 'approved',
+                      'text-red-600': notification.informacionPermiso.estado === 'rejected',
+                      'text-yellow-600': notification.informacionPermiso.estado === 'pending'
+                    }">
+                {{ notification.informacionPermiso.estado }}
+              </span>
+            </p>
+          </div>
+
+          <p class="text-xs text-gray-500 mt-1">
             {{ formatDate(notification.fechaCreacion) }}
           </p>
         </div>
 
-        <!-- Indicador de no leído -->
         <div *ngIf="!notification.leido" class="flex-shrink-0">
           <div class="w-2 h-2 bg-blue-600 rounded-full"></div>
         </div>
       </div>
 
-      <!-- Botones de acción según tipo -->
       <div *ngIf="notification.tipo === 'approved' && !notification.leido" 
            class="mt-3 flex gap-2">
         <button
@@ -78,11 +110,11 @@
     </div>
   </div>
 
-  <!-- Footer -->
   <div class="p-3 border-t border-gray-200 bg-gray-50 text-center">
     <button 
       (click)="marcarTodasComoLeidas()"
-      class="text-sm text-blue-600 hover:text-blue-800 font-medium">
+      class="text-sm text-blue-600 hover:text-blue-800 font-medium"
+      [disabled]="!hasUnreadNotifications()">
       Marcar todas como leídas
     </button>
   </div>

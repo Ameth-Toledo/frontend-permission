@@ -1,20 +1,13 @@
+// src/app/components/header/header.component.ts
+
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TitleService } from '../../services/title/title.service';
 import { CommonModule } from '@angular/common';
 import { ModalNotifyComponent } from '../modal-notify/modal-notify.component';
-import { HttpClient } from '@angular/common/http';
-import { Subscription, interval } from 'rxjs';
-
-interface Notification {
-  notificationId: number;
-  senderId: number;
-  receiverId: number;
-  tipo: string;
-  mensaje: string;
-  relatedPermitId: number;
-  leido: boolean;
-  fechaCreacion: string;
-}
+import { NotifyService } from '../../services/notify/notify.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { Notify } from '../../models/notify';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-header',
@@ -27,61 +20,118 @@ export class HeaderComponent implements OnInit, OnDestroy {
   nameInterface: string = '';
   showSearch: boolean = false;
   showNotification: boolean = false;
-  notifications: Notification[] = [];
+  notifications: Notify[] = [];
   unreadCount: number = 0;
-  private pollingSubscription?: Subscription;
+  
+  private notificationsSubscription?: Subscription;
+  private unreadCountSubscription?: Subscription;
+  private currentUserId: number | null = null;
 
   constructor(
     private titleService: TitleService,
-    private http: HttpClient
+    private notifyService: NotifyService,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
+    // Suscribirse a los cambios de título y búsqueda
     this.titleService.title$.subscribe(title => this.nameInterface = title);
     this.titleService.search$.subscribe(show => this.showSearch = show);
     
-    // Cargar notificaciones inicialmente
-    this.loadNotifications();
+    // Obtener el usuario logueado
+    const currentUser = this.authService.getCurrentUser();
     
-    // Polling cada 30 segundos para actualizar notificaciones
-    this.pollingSubscription = interval(30000).subscribe(() => {
-      this.loadNotifications();
-    });
-  }
-
-  ngOnDestroy() {
-    if (this.pollingSubscription) {
-      this.pollingSubscription.unsubscribe();
+    if (currentUser && currentUser.userId) {
+      this.currentUserId = currentUser.userId;
+      console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId})`);
+      
+      // Solicitar permisos de notificación del navegador
+      this.notifyService.requestNotificationPermission();
+      
+      // Conectar al WebSocket con el userId del usuario logueado
+      this.notifyService.connect(currentUser.userId);
+      
+      // Suscribirse a las notificaciones en tiempo real
+      this.notificationsSubscription = this.notifyService.notifications$
+        .subscribe(notifications => {
+          this.notifications = notifications;
+          console.log(`📋 Notificaciones actualizadas en header: ${notifications.length}`);
+        });
+      
+      // Suscribirse al contador de no leídas
+      this.unreadCountSubscription = this.notifyService.unreadCount$
+        .subscribe(count => {
+          this.unreadCount = count;
+          console.log(`🔢 Contador no leídas: ${count}`);
+        });
+    } else {
+      console.warn('⚠️ No hay usuario logueado, no se conectará al WebSocket');
     }
   }
 
-  loadNotifications() {
-    const userId = 1; // Obtén el ID del usuario logueado
-    this.http.get<Notification[]>(`http://localhost:8080/api/notifications/${userId}`)
-      .subscribe({
-        next: (data) => {
-          this.notifications = data;
-          this.unreadCount = data.filter(n => !n.leido).length;
-        },
-        error: (err) => console.error('Error loading notifications:', err)
-      });
+  ngOnDestroy() {
+    console.log('🧹 Destruyendo HeaderComponent...');
+    
+    // Desconectar el WebSocket al destruir el componente
+    this.notifyService.disconnect();
+    
+    // Cancelar suscripciones
+    if (this.notificationsSubscription) {
+      this.notificationsSubscription.unsubscribe();
+    }
+    if (this.unreadCountSubscription) {
+      this.unreadCountSubscription.unsubscribe();
+    }
   }
 
   toggleNotification() {
     this.showNotification = !this.showNotification;
+    console.log(`🔔 Modal de notificaciones: ${this.showNotification ? 'abierto' : 'cerrado'}`);
   }
 
   closeNotification() {
     this.showNotification = false;
+    console.log('❌ Modal de notificaciones cerrado');
   }
 
   markNotificationAsRead(notificationId: number) {
-    this.http.put(`http://localhost:8080/api/notifications/${notificationId}/read`, {})
+    console.log(`✅ Marcando notificación ${notificationId} como leída...`);
+    
+    this.notifyService.markAsRead(notificationId)
       .subscribe({
         next: () => {
-          this.loadNotifications();
+          // Actualizar la notificación localmente
+          this.notifications = this.notifications.map(n => 
+            n.notificationId === notificationId 
+              ? { ...n, leido: true }
+              : n
+          );
+          
+          // Actualizar el contador
+          this.unreadCount = this.notifications.filter(n => !n.leido).length;
+          
+          console.log(`✅ Notificación ${notificationId} marcada como leída`);
         },
-        error: (err) => console.error('Error marking as read:', err)
+        error: (err) => console.error('❌ Error al marcar como leída:', err)
+      });
+  }
+
+  markAllAsRead() {
+    if (!this.currentUserId) {
+      console.error('❌ No hay usuario logueado');
+      return;
+    }
+
+    console.log('✅ Marcando todas las notificaciones como leídas...');
+    
+    this.notifyService.markAllAsRead(this.currentUserId)
+      .subscribe({
+        next: () => {
+          // Recargar notificaciones
+          this.notifyService.loadNotifications(this.currentUserId!);
+          console.log('✅ Todas las notificaciones marcadas como leídas');
+        },
+        error: (err) => console.error('❌ Error al marcar todas como leídas:', err)
       });
   }
 }

@@ -1,46 +1,8 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-
-interface Estudiante {
-  studentId: number;
-  userId: number;
-  nombreCompleto: string;
-  email: string;
-  telefono: string;
-  numeroMatricula: string;
-}
-
-interface Tutor {
-  tutorId: number;
-  userId: number;
-  nombreCompleto: string;
-  email: string;
-  telefono: string;
-}
-
-interface Profesor {
-  teacherId: number;
-  userId: number;
-  nombreCompleto: string;
-  email: string;
-  telefono: string;
-}
-
-interface Permiso {
-  permitId: number;
-  estudiante: Estudiante;
-  tutor: Tutor;
-  profesores: Profesor[];
-  startDate: string;
-  endDate: string;
-  reason: string;
-  description: string;
-  cuatrimestre: number;
-  evidence: string;
-  status: string;
-  requestDate: string;
-}
+import { PermitionService } from '../../services/permition/permition.service';
+import { Permition } from '../../models/permition';
 
 @Component({
   selector: 'app-permition-detail',
@@ -51,73 +13,54 @@ interface Permiso {
 })
 export class PermitionDetailComponent implements OnInit {
   matricula: string = '';
-  permiso: Permiso | null = null;
+  permiso: Permition | null = null;
+  isLoading: boolean = true;
+  errorMessage: string = '';
 
-  constructor(private route: ActivatedRoute) {}
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private permitionService: PermitionService
+  ) {}
 
   ngOnInit() {
     this.matricula = this.route.snapshot.paramMap.get('matricule') || '';
-    this.loadPermiso();
+    if (this.matricula) {
+      this.loadPermiso();
+    } else {
+      this.errorMessage = 'No se proporcionó una matrícula válida';
+      this.isLoading = false;
+    }
   }
 
   loadPermiso() {
-    // Aquí llamarías a tu servicio para obtener el permiso
-    // this.permisoService.getPermisoByMatricula(this.matricula).subscribe(...)
-    
-    // Datos de ejemplo
-    this.permiso = {
-      permitId: 10,
-      estudiante: {
-        studentId: 1,
-        userId: 1,
-        nombreCompleto: "Ameth de Jesus Mendez Toledo",
-        email: "233363@ids.upchiapas.edu.mx",
-        telefono: "9613037813",
-        numeroMatricula: "233363"
-      },
-      tutor: {
-        tutorId: 1,
-        userId: 2,
-        nombreCompleto: "Jared Tapia Torres Morga",
-        email: "233310@ids.upchiapas.edu.mx",
-        telefono: "9613037813"
-      },
-      profesores: [
-        {
-          teacherId: 1,
-          userId: 3,
-          nombreCompleto: "Sayuri Estefania Zuñiga Chacon",
-          email: "233349@ids.upchiapas.edu.mx",
-          telefono: "9613037813"
-        },
-        {
-          teacherId: 2,
-          userId: 5,
-          nombreCompleto: "Sujey  Calderon Martinez",
-          email: "233291@ids.upchiapas.edu.mx",
-          telefono: "9613037813"
-        },
-        {
-          teacherId: 3,
-          userId: 6,
-          nombreCompleto: "Karla Melissa Corral Zarate",
-          email: "233313@ids.upchiapas.edu.mx",
-          telefono: "9613037813"
+    this.isLoading = true;
+    this.errorMessage = '';
+
+    // Obtener todos los permisos y filtrar por matrícula
+    this.permitionService.getAllPermits().subscribe({
+      next: (response) => {
+        const permisoEncontrado = response.permits.find(
+          p => p.estudiante.numeroMatricula === this.matricula
+        );
+
+        if (permisoEncontrado) {
+          this.permiso = permisoEncontrado;
+        } else {
+          this.errorMessage = `No se encontró un permiso para la matrícula ${this.matricula}`;
         }
-      ],
-      startDate: "2025-11-02",
-      endDate: "2025-11-08",
-      reason: "Sports",
-      description: "El estudiante tiene un partido de futbol desconectate",
-      cuatrimestre: 7,
-      evidence: "https://mozilla.github.io/pdf.js/web/viewer.html?file=https%3A%2F%2Fres.cloudinary.com%2Fdbzllh3xf%2Fraw%2Fupload%2Fv1762130035%2Fpermits%2Fevidences%2Fut1anuwazjmkog2mkjrn",
-      status: "pending",
-      requestDate: "2025-11-02T18:33:55"
-    };
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar el permiso:', error);
+        this.errorMessage = 'Error al cargar los datos del permiso';
+        this.isLoading = false;
+      }
+    });
   }
 
   getStatusClass(): string {
-    switch(this.permiso?.status) {
+    switch(this.permiso?.status.toLowerCase()) {
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'pending':
@@ -130,7 +73,7 @@ export class PermitionDetailComponent implements OnInit {
   }
 
   getStatusText(): string {
-    switch(this.permiso?.status) {
+    switch(this.permiso?.status.toLowerCase()) {
       case 'approved':
         return 'Aprobado';
       case 'pending':
@@ -146,5 +89,9 @@ export class PermitionDetailComponent implements OnInit {
     if (this.permiso?.evidence) {
       window.open(this.permiso.evidence, '_blank');
     }
+  }
+
+  goBack() {
+    this.router.navigate(['dashboard/permission']);
   }
 }

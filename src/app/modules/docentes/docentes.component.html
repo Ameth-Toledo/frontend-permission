@@ -1,41 +1,139 @@
-<div class="mt-4">
+<!-- Estado de carga -->
+<div *ngIf="isLoading" class="mt-4 text-center py-12 bg-white rounded-lg shadow">
+  <i class='bx bx-loader-alt bx-spin text-5xl text-blue-600'></i>
+  <p class="mt-4 text-gray-600 font-medium">Cargando docentes...</p>
+</div>
+
+<!-- Mensaje de error -->
+<div *ngIf="error && !isLoading" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+  <i class='bx bx-error-circle text-4xl text-red-500'></i>
+  <p class="mt-2 text-red-700 font-medium">{{ error }}</p>
+  <button (click)="refreshTeachers()"
+    class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+    Intentar de nuevo
+  </button>
+</div>
+
+<!-- Contenido principal -->
+<div class="mt-4" *ngIf="!isLoading && !error">
+  <!-- Header con búsqueda y botón de refrescar -->
+  <div class="mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+      <h2 class="text-2xl font-bold text-gray-800">
+        
+        <span class="text-sm font-normal text-gray-500">Total de docentes: ({{ total }} total)</span>
+      </h2>
+      <button (click)="refreshTeachers()"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+        <i class='bx bx-refresh text-lg'></i>
+        Actualizar
+      </button>
+    </div>
+
+    <!-- Filtros por rol -->
+    <div class="flex flex-wrap gap-3 mb-4">
+      <button *ngFor="let filter of roleFilters" (click)="filterByRole(filter.value)"
+        [class]="getFilterButtonClass(filter.value)" class="flex items-center gap-2">
+        {{ filter.label }}
+        <span class="px-2 py-0.5 rounded-full text-xs font-bold"
+          [ngClass]="currentFilter === filter.value ? 'bg-blue-500' : 'bg-gray-200 text-gray-700'">
+          {{ getCountByRole(filter.value) }}
+        </span>
+      </button>
+    </div>
+
+    <!-- Barra de búsqueda -->
+    <div class="relative">
+      <input type="text" [value]="searchTerm" (input)="searchTeachers($event)"
+        placeholder="Buscar por nombre, email, teléfono o rol..."
+        class="w-full px-4 py-3 pl-12 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <i class='bx bx-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl'></i>
+      <button *ngIf="searchTerm" (click)="clearSearch()"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+        <i class='bx bx-x text-2xl'></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Tabla -->
   <div class="overflow-x-auto shadow-md rounded-lg">
     <table class="min-w-full bg-white">
       <thead class="bg-gray-800 text-white">
         <tr>
-          <th class="py-3 px-4 text-left text-sm font-semibold">ID</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Usuario ID</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Nombre Completo</th>
+          <th class="py-3 px-4 text-left text-sm font-semibold">Docente</th>
           <th class="py-3 px-4 text-left text-sm font-semibold">Email</th>
           <th class="py-3 px-4 text-left text-sm font-semibold">Teléfono</th>
           <th class="py-3 px-4 text-left text-sm font-semibold">Rol</th>
           <th class="py-3 px-4 text-left text-sm font-semibold">Fecha Registro</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Acciones</th>
+          <th class="py-3 px-4 text-center text-sm font-semibold">Acciones</th>
         </tr>
       </thead>
       <tbody class="divide-y divide-gray-200">
-        <tr *ngFor="let teacher of teachers" class="hover:bg-gray-50 transition-colors">
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.teacherId }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.userId }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.informacionPersonal.nombreCompleto }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.informacionPersonal.email }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.informacionPersonal.telefono }}</td>
+        <tr *ngFor="let teacher of teachersFiltered" class="hover:bg-gray-50 transition-colors">
+
+          <!-- Docente -->
           <td class="py-3 px-4 text-sm">
-            <span [ngClass]="{
-              'bg-blue-100 text-blue-800': teacher.informacionRol.nombreRol === 'Tutor',
-              'bg-green-100 text-green-800': teacher.informacionRol.nombreRol === 'Teacher'
-            }" class="px-2 py-1 rounded-full text-xs font-semibold">
-              {{ teacher.informacionRol.nombreRol }}
-            </span>
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 h-12 w-12 rounded-full flex items-center justify-center shadow-md" [ngClass]="{
+                     'bg-gradient-to-br from-blue-500 to-blue-600': teacher.informacionRol.nombreRol === 'Tutor',
+                     'bg-gradient-to-br from-green-500 to-green-600': teacher.informacionRol.nombreRol === 'Teacher'
+                   }">
+                <div class="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <i class='bx bxs-user text-blue-600 text-2xl'></i>
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-gray-900 font-semibold">{{ teacher.informacionPersonal.nombreCompleto }}</span>
+                <span class="text-gray-500 text-xs">ID: {{ teacher.teacherId }} | User: {{ teacher.userId }}</span>
+              </div>
+            </div>
           </td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ teacher.fechaRegistro | date:'short' }}</td>
+
+          <!-- Email -->
           <td class="py-3 px-4 text-sm">
-            <div class="flex gap-2">
-              <button 
-                (click)="verDetalle(teacher)"
-                class="p-1 rounded hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
-                title="Ver detalle">
-                <i class='bx bx-show text-lg'></i>
+            <div class="flex items-center gap-2">
+              <i class='bx bx-envelope text-gray-400'></i>
+              <span class="text-gray-700">{{ teacher.informacionPersonal.email }}</span>
+            </div>
+          </td>
+
+          <!-- Teléfono -->
+          <td class="py-3 px-4 text-sm">
+            <div class="flex items-center gap-2">
+              <i class='bx bx-phone text-green-600'></i>
+              <span class="text-gray-700 font-medium">{{ teacher.informacionPersonal.telefono }}</span>
+            </div>
+          </td>
+
+          <!-- Rol -->
+          <td class="py-3 px-4 text-sm">
+            <div class="flex flex-col gap-1">
+              <span [ngClass]="getRoleBadgeClass(teacher.informacionRol.nombreRol)"
+                class="px-3 py-1 rounded-full text-xs font-semibold inline-flex items-center gap-1 w-fit">
+                <i class='bx' [ngClass]="getRoleIcon(teacher.informacionRol.nombreRol)"></i>
+                {{ teacher.informacionRol.nombreRol }}
+              </span>
+              <span class="text-xs text-gray-500" [title]="teacher.informacionRol.descripcion">
+                {{ teacher.informacionRol.descripcion }}
+              </span>
+            </div>
+          </td>
+
+          <!-- Fecha Registro -->
+          <td class="py-3 px-4 text-sm text-gray-700">
+            <div class="flex flex-col">
+              <span class="font-medium">{{ teacher.fechaRegistro | date:'dd/MM/yyyy' }}</span>
+              <span class="text-xs text-gray-500">{{ teacher.fechaRegistro | date:'HH:mm' }}</span>
+            </div>
+          </td>
+
+          <!-- Acciones -->
+          <td class="py-3 px-4 text-sm">
+            <div class="flex gap-2 justify-center">
+              <button (click)="verDetalle(teacher)"
+                class="p-2 rounded-lg hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
+                title="Ver detalles del docente">
+                <i class='bx bx-show text-xl'></i>
               </button>
             </div>
           </td>
@@ -44,11 +142,54 @@
     </table>
   </div>
 
-  <div *ngIf="teachers.length === 0" class="text-center py-8 text-gray-500">
-    No hay docentes registrados
+  <!-- Estado vacío - sin resultados de búsqueda o filtro -->
+  <div *ngIf="teachersFiltered.length === 0 && teachers.length > 0"
+    class="text-center py-12 bg-white rounded-lg shadow mt-4">
+    <i class='bx bx-search-alt text-6xl text-gray-300'></i>
+    <p class="mt-4 text-gray-500 text-lg font-medium">No se encontraron resultados</p>
+    <p class="text-sm text-gray-400 mt-2">Intenta con otro término de búsqueda o cambia el filtro</p>
+    <div class="flex gap-3 justify-center mt-4">
+      <button *ngIf="searchTerm" (click)="clearSearch()"
+        class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        Limpiar búsqueda
+      </button>
+      <button *ngIf="currentFilter !== 'all'" (click)="filterByRole('all')"
+        class="px-4 py-2 bg-gray-600 text-white rounded-lg hover:bg-gray-700 transition-colors">
+        Ver todos
+      </button>
+    </div>
   </div>
 
-  <div *ngIf="teachers.length > 0" class="mt-4 text-sm text-gray-600">
-    Total de docentes: {{ total }}
+  <!-- Estado vacío - sin docentes -->
+  <div *ngIf="teachers.length === 0" class="text-center py-12 bg-white rounded-lg shadow mt-4">
+    <i class='bx bx-user-x text-6xl text-gray-300'></i>
+    <p class="mt-4 text-gray-500 text-lg font-medium">No hay docentes registrados</p>
+    <p class="text-sm text-gray-400 mt-2">Los docentes aparecerán aquí cuando sean registrados en el sistema</p>
+  </div>
+
+  <!-- Footer informativo -->
+  <div *ngIf="teachersFiltered.length > 0" class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+    <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-sm text-gray-600">
+      <div class="flex items-center gap-4 flex-wrap">
+        <span class="flex items-center gap-2">
+          <i class='bx bx-info-circle text-blue-600'></i>
+          Mostrando: <strong class="text-gray-900">{{ teachersFiltered.length }}</strong> de <strong
+            class="text-gray-900">{{ total }}</strong>
+        </span>
+        <span *ngIf="currentFilter !== 'all'"
+          class="flex items-center gap-2 text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+          <i class='bx bx-filter'></i>
+          Filtro: <strong>{{ getCurrentFilterLabel() }}</strong>
+        </span>
+        <span *ngIf="searchTerm"
+          class="flex items-center gap-2 text-xs px-3 py-1 bg-green-50 text-green-700 rounded-full">
+          <i class='bx bx-search'></i>
+          Búsqueda activa
+        </span>
+      </div>
+      <span class="text-xs text-gray-500">
+        Click en <i class='bx bx-show text-blue-600'></i> para ver detalles del docente
+      </span>
+    </div>
   </div>
 </div>

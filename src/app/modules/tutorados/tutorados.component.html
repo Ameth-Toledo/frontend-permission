@@ -1,64 +1,166 @@
-<!-- tutorados.component.html -->
-<div class="mt-4">
-  <div class="overflow-x-auto shadow-md rounded-lg">
-    <table class="min-w-full bg-white">
-      <thead class="bg-gray-800 text-white">
-        <tr>
-          <th class="py-3 px-4 text-left text-sm font-semibold">ID</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Matrícula</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Nombre Completo</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Email</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Teléfono</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Teléfono Tutor Familiar</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Tutor ID</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Fecha Registro</th>
-          <th class="py-3 px-4 text-left text-sm font-semibold">Acciones</th>
-        </tr>
-      </thead>
-      <tbody class="divide-y divide-gray-200">
-        <tr *ngFor="let student of students" class="hover:bg-gray-50 transition-colors">
-          <td class="py-3 px-4 text-sm text-gray-700">{{ student.studentId }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">
-            <span *ngIf="student.matricula" class="font-medium">{{ student.matricula }}</span>
-            <span *ngIf="!student.matricula" class="text-gray-400 italic">Sin matrícula</span>
-          </td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ student.informacionPersonal.nombreCompleto }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ student.informacionPersonal.email }}</td>
-          <td class="py-3 px-4 text-sm text-gray-700">
-            <span *ngIf="student.informacionPersonal.telefono">{{ student.informacionPersonal.telefono }}</span>
-            <span *ngIf="!student.informacionPersonal.telefono" class="text-gray-400 italic">N/A</span>
-          </td>
-          <td class="py-3 px-4 text-sm text-gray-700">
-            <span *ngIf="student.telefonoTutorFamiliar">{{ student.telefonoTutorFamiliar }}</span>
-            <span *ngIf="!student.telefonoTutorFamiliar" class="text-gray-400 italic">N/A</span>
-          </td>
-          <td class="py-3 px-4 text-sm text-gray-700">
-            <span *ngIf="student.tutorId" class="px-2 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
-              {{ student.tutorId }}
-            </span>
-            <span *ngIf="!student.tutorId" class="text-gray-400 italic">Sin asignar</span>
-          </td>
-          <td class="py-3 px-4 text-sm text-gray-700">{{ student.fechaRegistro | date:'short' }}</td>
-          <td class="py-3 px-4 text-sm">
-            <div class="flex gap-2">
-              <button 
-                (click)="verDetalle(student)"
-                class="p-1 rounded hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
-                title="Ver detalle">
-                <i class='bx bx-show text-lg'></i>
-              </button>
-            </div>
-          </td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <div *ngIf="students.length === 0" class="text-center py-8 text-gray-500">
-    No hay estudiantes registrados
-  </div>
-
-  <div *ngIf="students.length > 0" class="mt-4 text-sm text-gray-600">
-    Total de estudiantes: {{ total }}
-  </div>
+<div *ngIf="isLoading" class="mt-4 text-center py-12 bg-white rounded-lg shadow">
+  <i class='bx bx-loader-alt bx-spin text-5xl text-blue-600'></i>
+  <p class="mt-4 text-gray-600 font-medium">Cargando tutorados...</p>
 </div>
+
+<div *ngIf="error && !isLoading" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+  <i class='bx bx-error-circle text-4xl text-red-500'></i>
+  <p class="mt-2 text-red-700 font-medium">{{ error }}</p>
+  <button (click)="refreshStudents()"
+    class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+    Intentar de nuevo
+  </button>
+</div>
+
+<div class="mt-4" *ngIf="!isLoading && !error">
+  <div class="mb-6">
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+      <span class="text-sm font-normal text-gray-500">Total de tutorados: ({{ total }} total)</span>
+      <button (click)="refreshStudents()"
+        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+        <i class='bx bx-refresh text-lg'></i>
+        Actualizar
+      </button>
+    </div>
+
+    <!-- Barra de búsqueda 
+    <div class="relative">
+      <input 
+        type="text" 
+        [value]="searchTerm"
+        (input)="searchStudents($event)"
+        placeholder="Buscar por nombre, matrícula o email..."
+        class="w-full px-4 py-3 pl-12 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
+      <i class='bx bx-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl'></i>
+      <button 
+        *ngIf="searchTerm"
+        (click)="clearSearch()"
+        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
+        <i class='bx bx-x text-2xl'></i>
+      </button>
+    </div>
+  </div>-->
+
+    <!-- Tabla -->
+    <div class="overflow-x-auto shadow-md rounded-lg">
+      <table class="min-w-full bg-white">
+        <thead class="bg-gray-800 text-white">
+          <tr>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Estudiante</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Matrícula</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Email</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Teléfono</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Teléfono Tutor Familiar</th>
+            <th class="py-3 px-4 text-left text-sm font-semibold">Fecha Registro</th>
+            <th class="py-3 px-4 text-center text-sm font-semibold">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <tr *ngFor="let student of studentsFiltered" class="hover:bg-gray-50 transition-colors">
+
+            <td class="py-3 px-4 text-sm">
+              <div class="flex items-center gap-3">
+                <div class="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
+                  <i class='bx bxs-user text-blue-600 text-2xl'></i>
+                </div>
+                <div class="flex flex-col">
+                  <span class="text-gray-900 font-semibold">{{ student.informacionPersonal.nombreCompleto }}</span>
+                  <span class="text-gray-500 text-xs">ID: {{ student.studentId }}</span>
+                </div>
+              </div>
+            </td>
+
+            <td class="py-3 px-4 text-sm">
+              <span *ngIf="student.matricula"
+                class="inline-flex items-center gap-1 px-3 py-1 bg-indigo-50 text-indigo-700 rounded-full font-medium">
+                <i class='bx bx-id-card text-lg'></i>
+                {{ student.matricula }}
+              </span>
+              <span *ngIf="!student.matricula" class="text-gray-400 italic text-xs">Sin matrícula</span>
+            </td>
+
+            <td class="py-3 px-4 text-sm">
+              <div class="flex items-center gap-2">
+                <i class='bx bx-envelope text-gray-400'></i>
+                <span class="text-gray-700">{{ student.informacionPersonal.email }}</span>
+              </div>
+            </td>
+
+            <td class="py-3 px-4 text-sm">
+              <div *ngIf="student.informacionPersonal.telefono" class="flex items-center gap-2">
+                <i class='bx bx-phone text-green-600'></i>
+                <span class="text-gray-700 font-medium">{{ student.informacionPersonal.telefono }}</span>
+              </div>
+              <span *ngIf="!student.informacionPersonal.telefono" class="text-gray-400 italic text-xs">
+                <i class='bx bx-phone-off text-gray-300'></i> N/A
+              </span>
+            </td>
+
+            <td class="py-3 px-4 text-sm">
+              <div *ngIf="student.telefonoTutorFamiliar" class="flex items-center gap-2">
+                <i class='bx bxs-phone-call text-purple-600'></i>
+                <span class="text-gray-700 font-medium">{{ student.telefonoTutorFamiliar }}</span>
+              </div>
+              <span *ngIf="!student.telefonoTutorFamiliar" class="text-gray-400 italic text-xs">
+                <i class='bx bx-phone-off text-gray-300'></i> N/A
+              </span>
+            </td>
+
+            <td class="py-3 px-4 text-sm text-gray-700">
+              <div class="flex flex-col">
+                <span class="font-medium">{{ student.fechaRegistro | date:'dd/MM/yyyy' }}</span>
+                <span class="text-xs text-gray-500">{{ student.fechaRegistro | date:'HH:mm' }}</span>
+              </div>
+            </td>
+
+            <td class="py-3 px-4 text-sm">
+              <div class="flex gap-2 justify-center">
+                <button (click)="verDetalle(student)"
+                  class="p-2 rounded-lg hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
+                  title="Ver detalles del tutorado">
+                  <i class='bx bx-show text-xl'></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div *ngIf="studentsFiltered.length === 0 && students.length > 0"
+      class="text-center py-12 bg-white rounded-lg shadow mt-4">
+      <i class='bx bx-search-alt text-6xl text-gray-300'></i>
+      <p class="mt-4 text-gray-500 text-lg font-medium">No se encontraron resultados</p>
+      <p class="text-sm text-gray-400 mt-2">Intenta con otro término de búsqueda</p>
+      <button (click)="clearSearch()"
+        class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+        Limpiar búsqueda
+      </button>
+    </div>
+
+    <div *ngIf="students.length === 0" class="text-center py-12 bg-white rounded-lg shadow mt-4">
+      <i class='bx bx-user-x text-6xl text-gray-300'></i>
+      <p class="mt-4 text-gray-500 text-lg font-medium">No tienes tutorados asignados</p>
+      <p class="text-sm text-gray-400 mt-2">Los estudiantes aparecerán aquí cuando se te asignen</p>
+    </div>
+
+    <div *ngIf="studentsFiltered.length > 0" class="mt-4 bg-gray-50 rounded-lg p-4 border border-gray-200">
+      <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-3 text-sm text-gray-600">
+        <div class="flex items-center gap-4">
+          <span class="flex items-center gap-2">
+            <i class='bx bx-info-circle text-blue-600'></i>
+            Mostrando: <strong class="text-gray-900">{{ studentsFiltered.length }}</strong> de <strong
+              class="text-gray-900">{{ total }}</strong>
+          </span>
+          <span *ngIf="searchTerm"
+            class="flex items-center gap-2 text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
+            <i class='bx bx-search'></i>
+            Búsqueda activa
+          </span>
+        </div>
+        <span class="text-xs text-gray-500">
+          Click en <i class='bx bx-show text-blue-600'></i> para ver detalles del tutorado
+        </span>
+      </div>
+    </div>
+  </div>

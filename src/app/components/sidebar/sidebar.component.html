@@ -8,37 +8,49 @@
     <nav class="flex-1 py-3 overflow-y-auto">
         <ul class="space-y-0">
             <li>
-                <a (click)="sendToHome($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToHome($event)" 
+                   [class.bg-[#004A7F]]="isActive('welcome')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-home text-xl mr-3'></i>
                     <span class="font-medium text-sm">Inicio</span>
                 </a>
             </li>
             <li>
-                <a (click)="sendToTutorados($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToTutorados($event)" 
+                   [class.bg-[#004A7F]]="isActive('tutorados')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-group text-xl mr-3'></i>
                     <span class="font-medium text-sm">Tutorados</span>
                 </a>
             </li>
             <!--<li>
-                <a (click)="sendToEvidences($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToEvidences($event)" 
+                   [class.bg-[#004A7F]]="isActive('evidencias')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-briefcase text-xl mr-3'></i>
                     <span class="font-medium text-sm">Evidencias</span>
                 </a>
             </li>-->
             <li>
-                <a (click)="sendToPermissions($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToPermissions($event)" 
+                   [class.bg-[#004A7F]]="isActive('permission')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-file text-xl mr-3'></i>
                     <span class="font-medium text-sm">Permisos</span>
                 </a>
             </li>
             <li>
-                <a (click)="sendToDocentes($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToDocentes($event)" 
+                   [class.bg-[#004A7F]]="isActive('docentes')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-user text-xl mr-3'></i>
                     <span class="font-medium text-sm">Docentes</span>
                 </a>
             </li>
             <li>
-                <a (click)="sendToHistorial($event)" class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
+                <a (click)="sendToHistorial($event)" 
+                   [class.bg-[#004A7F]]="isActive('historial')"
+                   class="flex items-center px-6 py-3 hover:bg-[#004A7F] transition-colors cursor-pointer">
                     <i class='bx bx-file text-xl mr-3'></i>
                     <span class="font-medium text-sm">Historial</span>
                 </a>

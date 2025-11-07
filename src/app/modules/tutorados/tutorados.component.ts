@@ -1,24 +1,10 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TitleService } from '../../services/title/title.service';
-
-interface Student {
-  studentId: number;
-  matricula: string;
-  telefonoTutorFamiliar: string | null;
-  userId: number;
-  tutorId: number | null;
-  informacionPersonal: {
-    nombreCompleto: string;
-    email: string;
-    telefono: string | null;
-  };
-  informacionRol: {
-    nombreRol: string;
-    descripcion: string;
-  };
-  fechaRegistro: string;
-}
+import { TutoradosService } from '../../services/tutorados/tutorados.service';
+import { AuthService } from '../../services/auth/auth.service';
+import { Tutorado } from '../../models/tutorado';
 
 @Component({
   selector: 'app-tutorados',
@@ -28,81 +14,89 @@ interface Student {
   styleUrls: ['./tutorados.component.css']
 })
 export class TutoradosComponent implements OnInit {
-  students: Student[] = [];
+  students: Tutorado[] = [];
+  studentsFiltered: Tutorado[] = [];
   total: number = 0;
+  isLoading: boolean = false;
+  error: string = '';
+  searchTerm: string = '';
 
-  constructor(private titleService: TitleService) { }
+  constructor(
+    private titleService: TitleService,
+    private tutoradosService: TutoradosService,
+    private authService: AuthService,
+    private router: Router
+  ) { }
   
   ngOnInit() {
-    this.titleService.setTitle('Tutorados');
+    this.titleService.setTitle('Mis Tutorados');
     this.loadStudents();
   }
 
   loadStudents() {
-    // Reemplaza esto con tu llamada al servicio
-    const data = {
-      students: [
-        {
-          studentId: 3,
-          matricula: "",
-          telefonoTutorFamiliar: null,
-          userId: 8,
-          tutorId: null,
-          informacionPersonal: {
-            nombreCompleto: "JORED666  GitHub",
-            email: "243842@ids.upchiapas.edu.mx",
-            telefono: null
-          },
-          informacionRol: {
-            nombreRol: "Student",
-            descripcion: "User who can request school absence permits"
-          },
-          fechaRegistro: "2025-11-03T15:27:06"
-        },
-        {
-          studentId: 2,
-          matricula: "",
-          telefonoTutorFamiliar: null,
-          userId: 4,
-          tutorId: null,
-          informacionPersonal: {
-            nombreCompleto: "Victor Fabricio Perez Constantino",
-            email: "233394@ids.upchiapas.edu.mx",
-            telefono: "9613037813"
-          },
-          informacionRol: {
-            nombreRol: "Student",
-            descripcion: "User who can request school absence permits"
-          },
-          fechaRegistro: "2025-10-29T22:14:42"
-        },
-        {
-          studentId: 1,
-          matricula: "233363",
-          telefonoTutorFamiliar: "9611234567",
-          userId: 1,
-          tutorId: 1,
-          informacionPersonal: {
-            nombreCompleto: "Ameth de Jesus Mendez Toledo",
-            email: "233363@ids.upchiapas.edu.mx",
-            telefono: "9613037813"
-          },
-          informacionRol: {
-            nombreRol: "Student",
-            descripcion: "User who can request school absence permits"
-          },
-          fechaRegistro: "2025-10-28T18:56:43"
-        }
-      ],
-      total: 3
-    };
+    this.isLoading = true;
+    this.error = '';
 
-    this.students = data.students;
-    this.total = data.total;
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser) {
+      this.error = 'No hay usuario logueado';
+      this.isLoading = false;
+      return;
+    }
+
+    this.tutoradosService.getAllStudents().subscribe({
+      next: (response) => {
+        const tutorIdToFilter = currentUser.tutorId || currentUser.userId;
+        
+        this.students = response.students.filter(student => {
+          return student.tutorId === tutorIdToFilter;
+        });
+        
+        this.studentsFiltered = this.students;
+        this.total = this.students.length;
+        this.isLoading = false;
+      },
+      error: (error) => {
+        console.error('Error al cargar estudiantes:', error);
+        this.error = 'Error al cargar los estudiantes. Por favor, intenta de nuevo.';
+        this.isLoading = false;
+      }
+    });
   }
 
-  verDetalle(student: Student) {
+  searchStudents(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm = target.value.toLowerCase().trim();
+
+    if (!this.searchTerm) {
+      this.studentsFiltered = this.students;
+      return;
+    }
+
+    this.studentsFiltered = this.students.filter(student => {
+      const nombre = student.informacionPersonal.nombreCompleto.toLowerCase();
+      const matricula = student.matricula?.toLowerCase() || '';
+      const email = student.informacionPersonal.email.toLowerCase();
+      
+      return nombre.includes(this.searchTerm) || 
+             matricula.includes(this.searchTerm) || 
+             email.includes(this.searchTerm);
+    });
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.studentsFiltered = this.students;
+  }
+
+  verDetalle(student: Tutorado) {
     console.log('Ver detalle del estudiante:', student);
-    // Implementa aquí la lógica para ver el detalle o abrir el modal
+    // Implementa la navegación o modal aquí
+    // this.router.navigate(['/tutorados', student.studentId]);
+  }
+
+  refreshStudents() {
+    this.loadStudents();
   }
 }

@@ -1,5 +1,4 @@
-<header class="navbar fixed top-0 right-0 left-72 bg-white py-4 px-6 flex items-center justify-between gap-4 z-40 pr-12 shadow-md">
-
+<header class="navbar fixed top-0 right-0 left-72 py-12 px-6 mb-8 flex items-center justify-between gap-4 z-40 pr-12 bg-white">
   <div *ngIf="showSearch; else titleBlock" class="flex items-center gap-2 w-1/3">
     <i class='bx bx-search text-gray-500 text-lg'></i>
     <input type="text" placeholder="Buscar..."
@@ -13,11 +12,12 @@
   <div class="flex items-center gap-4 ml-auto relative">
     <button
       (click)="toggleNotification()"
-      class="relative hover:bg-gray-100 p-2 rounded-full transition-colors">
+      class="relative hover:bg-gray-100 p-2 rounded-full transition-colors"
+      title="Notificaciones">
       <i class='bx bx-bell text-2xl text-gray-600'></i>
       <span *ngIf="unreadCount > 0" 
-            class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-        {{ unreadCount }}
+            class="absolute top-1 right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+        {{ unreadCount > 99 ? '99+' : unreadCount }}
       </span>
     </button>
 
@@ -32,5 +32,6 @@
   [visible]="showNotification"
   [notifications]="notifications"
   (close)="closeNotification()"
-  (markAsRead)="markNotificationAsRead($event)">
+  (markAsRead)="markNotificationAsRead($event)"
+  (markAllAsRead)="markAllAsRead()">
 </app-modal-notify>

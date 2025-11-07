@@ -1,109 +1,161 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { TitleService } from '../../services/title/title.service';
-
-interface Teacher {
-  teacherId: number;
-  userId: number;
-  informacionPersonal: {
-    nombreCompleto: string;
-    email: string;
-    telefono: string;
-  };
-  informacionRol: {
-    nombreRol: string;
-    descripcion: string;
-  };
-  fechaRegistro: string;
-}
+import { DocentesService } from '../../services/docentes/docentes.service';
+import { Docente } from '../../models/docente';
 
 @Component({
   selector: 'app-docentes',
   standalone: true,
   imports: [CommonModule],
   templateUrl: './docentes.component.html',
+  styleUrls: ['./docentes.component.css']
 })
 export class DocentesComponent implements OnInit {
-  constructor(private titleService: TitleService) { }
-
-  teachers: Teacher[] = [];
+  teachers: Docente[] = [];
+  teachersFiltered: Docente[] = [];
   total: number = 0;
+  isLoading: boolean = false;
+  error: string = '';
+  searchTerm: string = '';
+  currentFilter: string = 'all';
+
+  roleFilters = [
+    { label: 'Todos', value: 'all' },
+    { label: 'Tutores', value: 'Tutor' },
+    { label: 'Profesores', value: 'Teacher' }
+  ];
+
+  constructor(
+    private titleService: TitleService,
+    private docentesService: DocentesService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
-    this.loadTeachers();
     this.titleService.setTitle('Docentes');
+    this.loadTeachers();
   }
 
   loadTeachers() {
-    // Reemplaza esto con tu llamada al servicio
-    const data = {
-      teachers: [
-        {
-          teacherId: 4,
-          userId: 9,
-          informacionPersonal: {
-            nombreCompleto: "Carlos Alberto Diaz Hernandez",
-            email: "cvdiaz@ids.upchiapas.edu.mx",
-            telefono: "9611234567"
-          },
-          informacionRol: {
-            nombreRol: "Tutor",
-            descripcion: "User in charge of approving or rejecting student permits"
-          },
-          fechaRegistro: "2025-11-03T16:47:58"
-        },
-        {
-          teacherId: 3,
-          userId: 6,
-          informacionPersonal: {
-            nombreCompleto: "Karla Melissa Corral Zarate",
-            email: "233313@ids.upchiapas.edu.mx",
-            telefono: "9613037813"
-          },
-          informacionRol: {
-            nombreRol: "Teacher",
-            descripcion: "Professor in charge of registering or validating student attendance"
-          },
-          fechaRegistro: "2025-10-31T00:25:12"
-        },
-        {
-          teacherId: 2,
-          userId: 5,
-          informacionPersonal: {
-            nombreCompleto: "Sujey  Calderon Martinez",
-            email: "233291@ids.upchiapas.edu.mx",
-            telefono: "9613037813"
-          },
-          informacionRol: {
-            nombreRol: "Teacher",
-            descripcion: "Professor in charge of registering or validating student attendance"
-          },
-          fechaRegistro: "2025-10-31T00:20:21"
-        },
-        {
-          teacherId: 1,
-          userId: 3,
-          informacionPersonal: {
-            nombreCompleto: "Sayuri Estefania Zuñiga Chacon",
-            email: "233349@ids.upchiapas.edu.mx",
-            telefono: "9613037813"
-          },
-          informacionRol: {
-            nombreRol: "Teacher",
-            descripcion: "Professor in charge of registering or validating student attendance"
-          },
-          fechaRegistro: "2025-10-29T20:17:10"
-        }
-      ],
-      total: 4
-    };
+    this.isLoading = true;
+    this.error = '';
 
-    this.teachers = data.teachers;
-    this.total = data.total;
+    this.docentesService.getAllTeachers().subscribe({
+      next: (response) => {
+        this.teachers = response.teachers;
+        this.teachersFiltered = this.teachers;
+        this.total = response.total;
+        this.isLoading = false;
+        this.applyFilter();
+      },
+      error: (error) => {
+        console.error('Error al cargar docentes:', error);
+        this.error = 'Error al cargar los docentes. Por favor, intenta de nuevo.';
+        this.isLoading = false;
+      }
+    });
   }
 
-  verDetalle(teacher: Teacher) {
+  filterByRole(role: string) {
+    this.currentFilter = role;
+    this.applyFilter();
+  }
+
+  applyFilter() {
+    let filtered = this.teachers;
+
+    // Filtrar por rol
+    if (this.currentFilter !== 'all') {
+      filtered = filtered.filter(teacher => 
+        teacher.informacionRol.nombreRol === this.currentFilter
+      );
+    }
+
+    // Filtrar por búsqueda
+    if (this.searchTerm) {
+      const term = this.searchTerm.toLowerCase().trim();
+      filtered = filtered.filter(teacher => {
+        const nombre = teacher.informacionPersonal.nombreCompleto.toLowerCase();
+        const email = teacher.informacionPersonal.email.toLowerCase();
+        const telefono = teacher.informacionPersonal.telefono.toLowerCase();
+        const rol = teacher.informacionRol.nombreRol.toLowerCase();
+        
+        return nombre.includes(term) || 
+               email.includes(term) || 
+               telefono.includes(term) ||
+               rol.includes(term);
+      });
+    }
+
+    this.teachersFiltered = filtered;
+  }
+
+  searchTeachers(event: Event) {
+    const target = event.target as HTMLInputElement;
+    this.searchTerm = target.value;
+    this.applyFilter();
+  }
+
+  clearSearch() {
+    this.searchTerm = '';
+    this.applyFilter();
+  }
+
+  getCountByRole(role: string): number {
+    if (role === 'all') {
+      return this.teachers.length;
+    }
+    return this.teachers.filter(teacher => 
+      teacher.informacionRol.nombreRol === role
+    ).length;
+  }
+
+  getFilterButtonClass(role: string): string {
+    const baseClasses = 'px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200';
+    
+    if (this.currentFilter === role) {
+      return `${baseClasses} bg-blue-600 text-white shadow-lg transform scale-105`;
+    }
+    return `${baseClasses} bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-300`;
+  }
+
+  getRoleBadgeClass(role: string): string {
+    switch(role) {
+      case 'Tutor':
+        return 'bg-blue-100 text-blue-800';
+      case 'Teacher':
+        return 'bg-green-100 text-green-800';
+      default:
+        return 'bg-gray-100 text-gray-800';
+    }
+  }
+
+  getRoleIcon(role: string): string {
+    switch(role) {
+      case 'Tutor':
+        return 'bx-user-check';
+      case 'Teacher':
+        return 'bx-chalkboard';
+      default:
+        return 'bx-user';
+    }
+  }
+
+  // 👇 NUEVO MÉTODO AGREGADO
+  getCurrentFilterLabel(): string {
+    const filter = this.roleFilters.find(f => f.value === this.currentFilter);
+    return filter ? filter.label : 'Todos';
+  }
+
+  verDetalle(teacher: Docente) {
     console.log('Ver detalle del docente:', teacher);
-    // Implementa aquí la lógica para ver el detalle
+    // Implementa la navegación aquí
+    // this.router.navigate(['/docentes', teacher.teacherId]);
+  }
+
+  refreshTeachers() {
+    this.loadTeachers();
   }
 }

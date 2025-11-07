@@ -12,6 +12,7 @@ import { HistorialComponent } from './modules/historial/historial.component';
 import { PermitionDetailComponent } from './modules/permition-detail/permition-detail.component';
 import { AuthCallbackComponent } from './modules/auth-callback/auth-callback.component';
 import { PermissionComponent } from './modules/permission/permission.component';
+import { TutoradoDetailComponent } from './modules/tutorado-detail/tutorado-detail.component';
 
 
 export const routes: Routes = [
@@ -27,6 +28,7 @@ export const routes: Routes = [
         { path: 'welcome', component: WelcomeComponent },
         { path: 'docentes', component: DocentesComponent },
         { path: 'historial', component: HistorialComponent },
-        { path: 'permition/detail/:matricule', component: PermitionDetailComponent }
+        { path: 'permition/detail/:matricule', component: PermitionDetailComponent },
+        { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent }
     ]}
 ];

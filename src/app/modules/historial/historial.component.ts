@@ -1,4 +1,3 @@
-// historial.component.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TitleService } from '../../services/title/title.service';
@@ -45,7 +44,6 @@ export class HistorialComponent implements OnInit {
   }
 
   loadHistories() {
-    // Reemplaza esto con tu llamada al servicio
     const data = {
       histories: [
         {

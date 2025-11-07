@@ -34,14 +34,15 @@ export class AuthService {
     window.location.href = `${this.apiUrl}/github`;
   }
 
-  saveAuthDataFromOAuth(data: { token: string; userId: number; name: string; email: string }): void {
+  saveAuthDataFromOAuth(data: { token: string; userId: number; tutorId?: number; name: string; email: string }): void {
     this.saveAuthData(data);
   }
 
-  private saveAuthData(data: { token: string; userId: number; name: string; email: string }): void {
+  private saveAuthData(data: { token: string; userId: number; tutorId?: number; name: string; email: string }): void {
     localStorage.setItem(this.tokenKey, data.token);
     const user: User = {
       userId: data.userId,
+      tutorId: data.tutorId, 
       name: data.name,
       email: data.email
     };

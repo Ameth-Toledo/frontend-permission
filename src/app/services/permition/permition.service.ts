@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class PermitionService {
-private apiUrl = `${environment.apiUrl}/api/permits`;
+  private apiUrl = `${environment.apiUrl}/api/permits`;
 
   constructor(private http: HttpClient) { }
 
