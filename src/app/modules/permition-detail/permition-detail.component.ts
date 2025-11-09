@@ -13,6 +13,7 @@ import { Permition } from '../../models/permition';
 })
 export class PermitionDetailComponent implements OnInit {
   matricula: string = '';
+  permitId: number = 0;
   permiso: Permition | null = null;
   isLoading: boolean = true;
   errorMessage: string = '';
@@ -21,14 +22,21 @@ export class PermitionDetailComponent implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private permitionService: PermitionService
-  ) {}
+  ) { }
 
   ngOnInit() {
+    // Capturar parámetros de la ruta (el parámetro en la ruta se llama 'id', no 'permitId')
     this.matricula = this.route.snapshot.paramMap.get('matricule') || '';
-    if (this.matricula) {
+    const permitIdParam = this.route.snapshot.paramMap.get('id'); // CAMBIO: usar 'id' en lugar de 'permitId'
+    
+    if (permitIdParam) {
+      this.permitId = parseInt(permitIdParam, 10);
+    }
+
+    if (this.permitId && this.matricula) {
       this.loadPermiso();
     } else {
-      this.errorMessage = 'No se proporcionó una matrícula válida';
+      this.errorMessage = 'No se proporcionaron parámetros válidos';
       this.isLoading = false;
     }
   }
@@ -37,17 +45,20 @@ export class PermitionDetailComponent implements OnInit {
     this.isLoading = true;
     this.errorMessage = '';
 
-    // Obtener todos los permisos y filtrar por matrícula
     this.permitionService.getAllPermits().subscribe({
       next: (response) => {
         const permisoEncontrado = response.permits.find(
-          p => p.estudiante.numeroMatricula === this.matricula
+          p => p.permitId === this.permitId
         );
 
         if (permisoEncontrado) {
-          this.permiso = permisoEncontrado;
+          if (permisoEncontrado.estudiante.numeroMatricula === this.matricula) {
+            this.permiso = permisoEncontrado;
+          } else {
+            this.errorMessage = `El permiso ${this.permitId} no corresponde a la matrícula ${this.matricula}`;
+          }
         } else {
-          this.errorMessage = `No se encontró un permiso para la matrícula ${this.matricula}`;
+          this.errorMessage = `No se encontró el permiso con ID ${this.permitId}`;
         }
         this.isLoading = false;
       },
@@ -60,7 +71,7 @@ export class PermitionDetailComponent implements OnInit {
   }
 
   getStatusClass(): string {
-    switch(this.permiso?.status.toLowerCase()) {
+    switch (this.permiso?.status.toLowerCase()) {
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'pending':
@@ -73,7 +84,7 @@ export class PermitionDetailComponent implements OnInit {
   }
 
   getStatusText(): string {
-    switch(this.permiso?.status.toLowerCase()) {
+    switch (this.permiso?.status.toLowerCase()) {
       case 'approved':
         return 'Aprobado';
       case 'pending':
@@ -93,5 +104,47 @@ export class PermitionDetailComponent implements OnInit {
 
   goBack() {
     this.router.navigate(['dashboard/permission']);
+  }
+
+  approvePermission() {
+    if (!this.permiso) return;
+
+    if (confirm('¿Está seguro que desea aprobar este permiso?')) {
+      this.isLoading = true;
+
+      this.permitionService.updatePermitStatus(this.permiso.permitId, 'approved').subscribe({
+        next: (response) => {
+          this.permiso = response;
+          this.isLoading = false;
+          alert('Permiso aprobado exitosamente');
+        },
+        error: (error) => {
+          console.error('Error al aprobar el permiso:', error);
+          alert('Error al aprobar el permiso');
+          this.isLoading = false;
+        }
+      });
+    }
+  }
+
+  declinePermission() {
+    if (!this.permiso) return;
+
+    if (confirm('¿Está seguro que desea rechazar este permiso?')) {
+      this.isLoading = true;
+
+      this.permitionService.updatePermitStatus(this.permiso.permitId, 'rejected').subscribe({
+        next: (response) => {
+          this.permiso = response;
+          this.isLoading = false;
+          alert('Permiso rechazado exitosamente');
+        },
+        error: (error) => {
+          console.error('Error al rechazar el permiso:', error);
+          alert('Error al rechazar el permiso');
+          this.isLoading = false;
+        }
+      });
+    }
   }
 }

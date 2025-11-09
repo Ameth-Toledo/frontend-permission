@@ -127,7 +127,7 @@ export class NotifyService {
   }
 
   markAsRead(notificationId: number): Observable<any> {
-    return this.http.patch(`${this.API_URL}/${notificationId}/read`, {});
+    return this.http.put(`${this.API_URL}/${notificationId}/read`, {});
   }
 
   markAllAsRead(userId: number): Observable<any> {

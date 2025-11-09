@@ -42,9 +42,9 @@ export class TutoradosService {
     });
   }
 
-  // Filtra solo los tutorados del tutor logueado
-  getMyTutorados(): Observable<TutoradosResponse> {
-    return this.http.get<TutoradosResponse>(this.apiUrl, {
+  // Obtiene los tutorados de un tutor específico
+  getStudentsByTutorId(tutorId: number): Observable<TutoradosResponse> {
+    return this.http.get<TutoradosResponse>(`${this.apiUrl}/tutor/${tutorId}`, {
       headers: this.getHeaders()
     });
   }

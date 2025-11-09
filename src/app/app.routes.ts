@@ -28,7 +28,7 @@ export const routes: Routes = [
         { path: 'welcome', component: WelcomeComponent },
         { path: 'docentes', component: DocentesComponent },
         { path: 'historial', component: HistorialComponent },
-        { path: 'permition/detail/:matricule', component: PermitionDetailComponent },
+        { path: 'permition/detail/:matricule/:id', component: PermitionDetailComponent },
         { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent }
     ]}
 ];

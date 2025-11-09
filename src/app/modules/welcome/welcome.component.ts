@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { TitleService } from '../../services/title/title.service';
 import { AuthService } from '../../services/auth/auth.service';
+import { TutoradosService } from '../../services/tutorados/tutorados.service';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 
@@ -14,15 +15,18 @@ import { CommonModule } from '@angular/common';
 export class WelcomeComponent implements OnInit {
   username: string = '';
   
-  totalTutorados: number = 48;
-  permisosPendientes: number = 5;
-  permisosAprobados: number = 23;
-  docentesActivos: number = 12;
+  totalTutorados: number = 0;
+  permisosPendientes: number = 0;
+  permisosAprobados: number = 0;
+  docentesActivos: number = 0;
+  
+  isLoading: boolean = true;
 
   constructor(
     private titleService: TitleService, 
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private tutoradosService: TutoradosService
   ) { }
 
   ngOnInit() {
@@ -39,7 +43,33 @@ export class WelcomeComponent implements OnInit {
   }
 
   loadDashboardData() {
-    // Aquí puedes cargar los datos del dashboard desde tu API
+    this.isLoading = true;
+    
+    const currentUser = this.authService.getCurrentUser();
+    
+    if (!currentUser || !currentUser.userId) {
+      console.error('No se encontró el userId del usuario logueado');
+      this.isLoading = false;
+      return;
+    }
+
+    // Cargar los tutorados del tutor logueado
+    this.tutoradosService.getStudentsByTutorId(currentUser.userId).subscribe({
+      next: (response) => {
+        this.totalTutorados = response.total;
+        this.isLoading = false;
+        console.log('✅ Tutorados cargados:', response);
+        console.log('📊 Total de tutorados:', this.totalTutorados);
+      },
+      error: (error) => {
+        console.error('❌ Error al cargar tutorados:', error);
+        this.totalTutorados = 0;
+        this.isLoading = false;
+      }
+    });
+    
+    // Aquí puedes agregar más llamadas para cargar otros datos del dashboard
+    // Por ejemplo: permisosPendientes, permisosAprobados, docentesActivos
   }
 
   sentTopermisos(event: Event) {

@@ -6,6 +6,7 @@ export interface InformacionRemitente {
 
 export interface InformacionPermiso {
   permitId: number;
+  matricula: string; 
   motivo: string;
   estado: string;
 }

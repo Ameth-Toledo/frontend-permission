@@ -115,7 +115,7 @@ export class PermissionComponent implements OnInit {
 
   
   viewPermitDetail(permiso: Permition) {
-    this.router.navigate(['dashboard/permition/detail', permiso.estudiante.numeroMatricula]);
+    this.router.navigate(['dashboard/permition/detail', permiso.estudiante.numeroMatricula, permiso.permitId]);
   }
 
   deletePermit(permitId: number, event: Event) {

@@ -54,4 +54,11 @@ export class PermitionService {
   deletePermit(id: number): Observable<void> {
     return this.http.delete<void>(`${this.apiUrl}/${id}`);
   }
+
+  // Actualizar estado del permiso
+  updatePermitStatus(id: number, status: 'approved' | 'rejected'): Observable<Permition> {
+    const formData = new FormData();
+    formData.append('status', status);
+    return this.http.put<Permition>(`${this.apiUrl}/${id}`, formData);
+  }
 }

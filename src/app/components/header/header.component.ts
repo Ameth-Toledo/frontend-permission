@@ -1,5 +1,3 @@
-// src/app/components/header/header.component.ts
-
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { TitleService } from '../../services/title/title.service';
 import { CommonModule } from '@angular/common';

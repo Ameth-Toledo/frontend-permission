@@ -22,9 +22,9 @@
     </div>
 
     <div *ngFor="let notification of notifications" 
-         class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
-         [class.bg-blue-50]="!notification.leido"
-         (click)="handleNotificationClick(notification)">
+     class="p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer"
+     [class.bg-blue-50]="!notification.leido"
+     (click)="handleNotificationClick(notification); verTipoNotificacion(notification)">
       
       <div class="flex items-start gap-3">
         <div class="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center"
@@ -39,7 +39,7 @@
                'bx bx-check text-green-600': notification.tipo === 'approved',
                'bx bx-x text-red-600': notification.tipo === 'rejected',
                'bx bx-file text-blue-600': notification.tipo === 'new_permit',
-               'bx bx-time text-yellow-600': notification.tipo === 'pending'
+               'bx bxs-error-circle text-yellow-600': notification.tipo === 'pending'
              }"></i>
         </div>
 
