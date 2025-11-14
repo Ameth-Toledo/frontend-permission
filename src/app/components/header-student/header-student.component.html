@@ -1,0 +1,47 @@
+<div class="w-full flex justify-center mb-1 mt-10">
+    <header class="bg-[#003D6B] flex items-center justify-between px-8 py-4 shadow-md w-[90%] h-24 rounded-tl-[20px] rounded-br-[20px] border-b-4 border-[#00A3E0]">
+        <div class="bg-white rounded-full p-2 flex items-center justify-center">
+            <img src="assets/logo.png" alt="Logo" class="h-10 w-10 object-contain">
+        </div>
+        
+        <h1 class="text-white text-2xl font-semibold flex-grow ml-6">AuthGrid</h1>
+        
+        <ul class="flex list-none gap-8">
+            <li class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
+                <i class='bx bx-file'></i>
+                <span>Permisos</span>
+            </li>
+            <li class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
+                <i class='bx bx-history'></i>
+                <span>Historial</span>
+            </li>
+        </ul>
+
+        <div class="flex items-center gap-4 ml-8">
+            <button
+                (click)="toggleNotification()"
+                class="relative hover:bg-white/10 p-2 rounded-full transition-colors"
+                title="Notificaciones">
+                <i class='bx bx-bell text-2xl text-white'></i>
+                <span *ngIf="unreadCount > 0" 
+                      class="absolute top-0 right-0 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
+                    {{ unreadCount > 99 ? '99+' : unreadCount }}
+                </span>
+            </button>
+            
+            <div class="flex items-center gap-3">
+                <span class="text-white font-medium">{{ name }}</span>
+                <img src="assets/default_image.jpeg" alt="Perfil"
+                     class="w-10 h-10 rounded-full object-cover border-2 border-white/50 hover:border-white transition-colors cursor-pointer">
+            </div>
+        </div>
+    </header>
+</div>
+
+<app-modal-notify
+    [visible]="showNotification"
+    [notifications]="notifications"
+    (close)="closeNotification()"
+    (markAsRead)="markNotificationAsRead($event)"
+    (markAllAsRead)="markAllAsRead()">
+</app-modal-notify>

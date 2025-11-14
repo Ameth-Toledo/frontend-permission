@@ -1,91 +1,40 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
-import { TitleService } from '../../services/title/title.service';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
 import { ModalNotifyComponent } from '../modal-notify/modal-notify.component';
 import { NotifyService } from '../../services/notify/notify.service';
 import { AuthService } from '../../services/auth/auth.service';
-import { TutoradosService } from '../../services/tutorados/tutorados.service';
 import { Notify } from '../../models/notify';
-import { Tutorado } from '../../models/tutorado';
-import { Subscription, Subject } from 'rxjs';
-import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
+import { Subscription } from 'rxjs';
 
 @Component({
-  selector: 'app-header',
+  selector: 'app-header-student',
   standalone: true,
-  imports: [CommonModule, ModalNotifyComponent, FormsModule],
-  templateUrl: './header.component.html',
-  styleUrls: ['./header.component.css']
+  imports: [CommonModule, ModalNotifyComponent],
+  templateUrl: './header-student.component.html',
+  styleUrl: './header-student.component.css'
 })
-export class HeaderComponent implements OnInit, OnDestroy {
-  nameInterface: string = '';
-  showSearch: boolean = false;
+export class HeaderStudentComponent implements OnInit, OnDestroy {
+  name: string = 'Toledo';
   showNotification: boolean = false;
   notifications: Notify[] = [];
   unreadCount: number = 0;
   
-  // Búsqueda de alumnos
-  searchQuery: string = '';
-  searchResults: Tutorado[] = [];
-  showSearchResults: boolean = false;
-  isSearching: boolean = false;
-  private searchSubject = new Subject<string>();
-  
   private notificationsSubscription?: Subscription;
   private unreadCountSubscription?: Subscription;
-  private searchSubscription?: Subscription;
   private currentUserId: number | null = null;
 
   constructor(
-    private titleService: TitleService,
     private notifyService: NotifyService,
-    private authService: AuthService,
-    private tutoradosService: TutoradosService,
-    private router: Router
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
-    // Suscribirse a los cambios de título y búsqueda
-    this.titleService.title$.subscribe(title => this.nameInterface = title);
-    this.titleService.search$.subscribe(show => this.showSearch = show);
-    
-    // Configurar búsqueda con debounce
-    this.searchSubscription = this.searchSubject.pipe(
-      debounceTime(300), // Espera 300ms después de que el usuario deje de escribir
-      distinctUntilChanged(), // Solo busca si el valor cambió
-      switchMap(query => {
-        if (query.trim().length < 2) {
-          this.searchResults = [];
-          this.showSearchResults = false;
-          this.isSearching = false;
-          return [];
-        }
-        
-        this.isSearching = true;
-        return this.tutoradosService.searchStudents(query);
-      })
-    ).subscribe({
-      next: (response) => {
-        this.searchResults = response.students || [];
-        this.showSearchResults = true;
-        this.isSearching = false;
-        console.log(`🔍 Resultados de búsqueda: ${this.searchResults.length}`);
-      },
-      error: (err) => {
-        console.error('❌ Error en búsqueda:', err);
-        this.searchResults = [];
-        this.showSearchResults = false;
-        this.isSearching = false;
-      }
-    });
-    
     // Obtener el usuario logueado
     const currentUser = this.authService.getCurrentUser();
     
     if (currentUser && currentUser.userId) {
       this.currentUserId = currentUser.userId;
+      this.name = currentUser.name; // Actualizar el nombre del usuario
       console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId})`);
       
       // Solicitar permisos de notificación del navegador
@@ -113,7 +62,7 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy() {
-    console.log('🧹 Destruyendo HeaderComponent...');
+    console.log('🧹 Destruyendo HeaderStudentComponent...');
     
     // Desconectar el WebSocket al destruir el componente
     this.notifyService.disconnect();
@@ -125,40 +74,6 @@ export class HeaderComponent implements OnInit, OnDestroy {
     if (this.unreadCountSubscription) {
       this.unreadCountSubscription.unsubscribe();
     }
-    if (this.searchSubscription) {
-      this.searchSubscription.unsubscribe();
-    }
-  }
-
-  // Método llamado cuando el usuario escribe en el input
-  onSearchInput(event: Event) {
-    const query = (event.target as HTMLInputElement).value;
-    this.searchQuery = query;
-    this.searchSubject.next(query);
-  }
-
-  // Seleccionar un alumno y navegar a generar permiso
-  selectStudent(student: Tutorado) {
-    console.log('✅ Alumno seleccionado:', student);
-    
-    // Guardar datos del alumno en sessionStorage para usarlos en la siguiente página
-    sessionStorage.setItem('selectedStudent', JSON.stringify(student));
-    
-    // Limpiar búsqueda
-    this.searchQuery = '';
-    this.searchResults = [];
-    this.showSearchResults = false;
-    
-    // Navegar a generar permiso
-    this.router.navigate(['/dashboard/generate-permission']);
-  }
-
-  // Cerrar resultados de búsqueda
-  closeSearchResults() {
-    // Pequeño delay para permitir el click en los resultados
-    setTimeout(() => {
-      this.showSearchResults = false;
-    }, 200);
   }
 
   toggleNotification() {

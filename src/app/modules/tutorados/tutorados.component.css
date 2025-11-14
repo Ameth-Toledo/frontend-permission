@@ -1,0 +1,28 @@
+tbody tr {
+  will-change: transform;
+}
+
+.refresh-btn {
+  will-change: transform;
+}
+
+.error-container {
+  will-change: transform, opacity;
+}
+
+.empty-state {
+  will-change: transform, opacity;
+}
+
+.header-section {
+  will-change: transform, opacity;
+}
+
+button {
+  will-change: transform;
+}
+
+table {
+  border-collapse: separate;
+  border-spacing: 0;
+}

@@ -1,0 +1,16 @@
+.menu-item {
+    position: relative;
+}
+.menu-item::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #00A3E0;
+    transition: width 0.3s ease;
+}
+.menu-item:hover::after {
+    width: 100%;
+}

@@ -6,9 +6,9 @@
     <p class="text-gray-600">Aquí tienes un resumen de tu actividad</p>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <!-- Total Tutorados -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+  <div class="stats-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-lg cursor-move" data-id="total-tutorados">
       <div class="flex items-center justify-between mb-4">
         <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
           <i class='bx bx-group text-2xl text-blue-600'></i>
@@ -27,8 +27,7 @@
       </p>
     </div>
 
-    <!-- Permisos Pendientes -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-lg cursor-move" data-id="permisos-pendientes">
       <div class="flex items-center justify-between mb-4">
         <div class="w-12 h-12 bg-yellow-100 rounded-xl flex items-center justify-center">
           <i class='bx bx-time text-2xl text-yellow-600'></i>
@@ -41,8 +40,7 @@
       <p class="text-3xl font-bold text-gray-800">{{ permisosPendientes }}</p>
     </div>
 
-    <!-- Permisos Aprobados -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-lg cursor-move" data-id="permisos-aprobados">
       <div class="flex items-center justify-between mb-4">
         <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
           <i class='bx bx-check-circle text-2xl text-green-600'></i>
@@ -55,8 +53,7 @@
       <p class="text-3xl font-bold text-gray-800">{{ permisosAprobados }}</p>
     </div>
 
-    <!-- Docentes Activos -->
-    <div class="bg-white rounded-2xl p-6 shadow-lg hover:shadow-xl transition-shadow">
+    <div class="stat-card bg-white rounded-2xl p-6 shadow-lg cursor-move" data-id="docentes-activos">
       <div class="flex items-center justify-between mb-4">
         <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
           <i class='bx bx-user text-2xl text-purple-600'></i>
@@ -68,27 +65,42 @@
       <h3 class="text-gray-600 text-sm font-medium mb-1">Docentes Activos</h3>
       <p class="text-3xl font-bold text-gray-800">{{ docentesActivos }}</p>
     </div>
+
   </div>
 
-  <!-- Accesos Rápidos -->
+  <div class="mb-4 flex justify-end">
+    <button (click)="resetLayout()" 
+            class="text-sm text-gray-600 hover:text-gray-800 flex items-center gap-2 transition-colors">
+      <i class='bx bx-reset'></i>
+      Restaurar diseño original
+    </button>
+  </div>
+
   <div class="mb-8">
     <h2 class="text-2xl font-bold text-gray-800 mb-4">Accesos Rápidos</h2>
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div class="quick-access-grid grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      
       <button (click)="sentTopermisos($event)" 
-              class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all text-left">
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="quick-access-btn bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-2xl p-6 shadow-lg text-left cursor-move"
+              data-id="permisos">
         <div class="flex items-center mb-3">
-          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+          <div class="icon-container w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
             <i class='bx bx-file-blank text-2xl'></i>
           </div>
-          <h3 class="text-xl font-bold">Generar Permiso</h3>
+          <h3 class="text-xl font-bold">Ver Permisos</h3>
         </div>
         <p class="text-blue-100 text-sm">Crea un nuevo permiso para tutorados</p>
       </button>
 
-      <button (click)="navigateTo('dashboard/tutorados')" 
-              class="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all text-left">
+      <button (click)="navigateTo('dashboard/tutorados')"
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="quick-access-btn bg-gradient-to-br from-green-500 to-green-600 text-white rounded-2xl p-6 shadow-lg text-left cursor-move"
+              data-id="tutorados">
         <div class="flex items-center mb-3">
-          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+          <div class="icon-container w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
             <i class='bx bx-group text-2xl'></i>
           </div>
           <h3 class="text-xl font-bold">Ver Tutorados</h3>
@@ -96,20 +108,23 @@
         <p class="text-green-100 text-sm">Gestiona tu lista de tutorados</p>
       </button>
 
-      <button (click)="navigateTo('dashboard/historial')" 
-              class="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg hover:shadow-xl hover:scale-105 transition-all text-left">
+      <button (click)="navigateTo('dashboard/historial')"
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="quick-access-btn bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-2xl p-6 shadow-lg text-left cursor-move"
+              data-id="historial">
         <div class="flex items-center mb-3">
-          <div class="w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
+          <div class="icon-container w-12 h-12 bg-white bg-opacity-20 rounded-xl flex items-center justify-center mr-4">
             <i class='bx bx-history text-2xl'></i>
           </div>
           <h3 class="text-xl font-bold">Historial</h3>
         </div>
         <p class="text-purple-100 text-sm">Revisa actividades anteriores</p>
       </button>
+      
     </div>
   </div>
 
-  <!-- Actividad Reciente -->
   <div class="bg-white rounded-2xl p-6 shadow-lg">
     <div class="flex items-center justify-between mb-6">
       <h2 class="text-2xl font-bold text-gray-800">Actividad Reciente</h2>
@@ -117,7 +132,7 @@
     </div>
     
     <div class="space-y-4">
-      <div class="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div class="activity-item flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
         <div class="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
           <i class='bx bx-check text-blue-600'></i>
         </div>
@@ -128,7 +143,7 @@
         </div>
       </div>
 
-      <div class="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div class="activity-item flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
         <div class="w-10 h-10 bg-green-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
           <i class='bx bx-user-plus text-green-600'></i>
         </div>
@@ -139,7 +154,7 @@
         </div>
       </div>
 
-      <div class="flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+      <div class="activity-item flex items-start p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
         <div class="w-10 h-10 bg-yellow-100 rounded-lg flex items-center justify-center mr-4 flex-shrink-0">
           <i class='bx bx-time text-yellow-600'></i>
         </div>

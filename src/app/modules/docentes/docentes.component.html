@@ -16,18 +16,24 @@
 
 <!-- Contenido principal -->
 <div class="mt-4" *ngIf="!isLoading && !error">
-  <!-- Header con búsqueda y botón de refrescar -->
+  <!-- Header con búsqueda y botones -->
   <div class="mb-6">
     <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
       <h2 class="text-2xl font-bold text-gray-800">
-        
         <span class="text-sm font-normal text-gray-500">Total de docentes: ({{ total }} total)</span>
       </h2>
-      <button (click)="refreshTeachers()"
-        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
-        <i class='bx bx-refresh text-lg'></i>
-        Actualizar
-      </button>
+      <div class="flex gap-3">
+        <button (click)="openModal()"
+          class="flex items-center gap-2 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors shadow-md hover:shadow-lg">
+          <i class='bx bx-plus text-lg'></i>
+          Nuevo Docente
+        </button>
+        <button (click)="refreshTeachers()"
+          class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+          <i class='bx bx-refresh text-lg'></i>
+          Actualizar
+        </button>
+      </div>
     </div>
 
     <!-- Filtros por rol -->
@@ -78,9 +84,7 @@
                      'bg-gradient-to-br from-blue-500 to-blue-600': teacher.informacionRol.nombreRol === 'Tutor',
                      'bg-gradient-to-br from-green-500 to-green-600': teacher.informacionRol.nombreRol === 'Teacher'
                    }">
-                <div class="flex-shrink-0 h-12 w-12 bg-blue-100 rounded-full flex items-center justify-center">
-                  <i class='bx bxs-user text-blue-600 text-2xl'></i>
-                </div>
+                <i class='bx bxs-user text-white text-2xl'></i>
               </div>
               <div class="flex flex-col">
                 <span class="text-gray-900 font-semibold">{{ teacher.informacionPersonal.nombreCompleto }}</span>
@@ -101,7 +105,7 @@
           <td class="py-3 px-4 text-sm">
             <div class="flex items-center gap-2">
               <i class='bx bx-phone text-green-600'></i>
-              <span class="text-gray-700 font-medium">{{ teacher.informacionPersonal.telefono }}</span>
+              <span class="text-gray-700 font-medium">{{ teacher.informacionPersonal.telefono || 'N/A' }}</span>
             </div>
           </td>
 
@@ -113,7 +117,7 @@
                 <i class='bx' [ngClass]="getRoleIcon(teacher.informacionRol.nombreRol)"></i>
                 {{ teacher.informacionRol.nombreRol }}
               </span>
-              <span class="text-xs text-gray-500" [title]="teacher.informacionRol.descripcion">
+              <span class="text-xs text-gray-500" [title]="teacher.informacionRol.descripcion || ''">
                 {{ teacher.informacionRol.descripcion }}
               </span>
             </div>
@@ -190,6 +194,286 @@
       <span class="text-xs text-gray-500">
         Click en <i class='bx bx-show text-blue-600'></i> para ver detalles del docente
       </span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear docente -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" (click)="closeModal()"></div>
+
+    <!-- Modal panel -->
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class='bx bx-user-plus text-2xl'></i>
+            Crear Nuevo Docente
+          </h3>
+          <button (click)="closeModal()" class="text-white hover:text-gray-200 transition-colors">
+            <i class='bx bx-x text-3xl'></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="bg-white px-6 py-5">
+        <!-- Alert messages -->
+        <div *ngIf="formError" class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+          <i class='bx bx-error-circle text-red-600 text-2xl'></i>
+          <p class="text-red-700 text-sm">{{ formError }}</p>
+        </div>
+
+        <div *ngIf="formSuccess" class="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+          <i class='bx bx-check-circle text-green-600 text-2xl'></i>
+          <p class="text-green-700 text-sm">{{ formSuccess }}</p>
+        </div>
+
+        <!-- Form -->
+        <form class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Primer Nombre -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Primer Nombre <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.firstName" name="firstName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Karla" required>
+            </div>
+
+            <!-- Segundo Nombre (Opcional) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Segundo Nombre <span class="text-gray-400 text-xs">(Opcional)</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.middleName" name="middleName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Melissa">
+            </div>
+
+            <!-- Apellido Paterno -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Apellido Paterno <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.lastName" name="lastName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Corral" required>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Apellido Materno <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.secondLastName" name="secondLastName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Zarate" required>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Correo Electrónico <span class="text-red-500">*</span>
+              </label>
+              <input type="email" [(ngModel)]="teacherForm.email" name="email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: ejemplo@upchiapas.edu.mx" required>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Teléfono <span class="text-red-500">*</span>
+              </label>
+              <input type="tel" [(ngModel)]="teacherForm.phone" name="phone"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: 9613037813" required>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Contraseña <span class="text-red-500">*</span>
+              </label>
+              <input type="password" [(ngModel)]="teacherForm.password" name="password"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ingrese una contraseña segura" required>
+            </div>
+          </div>
+
+          <!-- Info box -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+            <i class='bx bx-info-circle text-blue-600 text-xl'></i>
+            <div class="text-sm text-blue-800">
+              <p class="font-semibold mb-1">Información importante:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Los campos marcados con <span class="text-red-500">*</span> son obligatorios</li>
+                <li>El docente será registrado con rol de <strong>Profesor (Teacher)</strong></li>
+                <li>El segundo nombre es opcional</li>
+              </ul>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+        <button type="button" (click)="closeModal()" [disabled]="isSubmitting"
+          class="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Cancelar
+        </button>
+        <button type="button" (click)="submitTeacher()" [disabled]="!isFormValid() || isSubmitting"
+          class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <i class='bx bx-loader-alt bx-spin text-xl' *ngIf="isSubmitting"></i>
+          <i class='bx bx-save text-xl' *ngIf="!isSubmitting"></i>
+          {{ isSubmitting ? 'Creando...' : 'Crear Docente' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear docente -->
+<div *ngIf="showModal" class="fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+  <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    <!-- Background overlay -->
+    <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" (click)="closeModal()"></div>
+
+    <!-- Modal panel -->
+    <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+      <!-- Header -->
+      <div class="bg-gradient-to-r from-green-600 to-green-700 px-6 py-4">
+        <div class="flex items-center justify-between">
+          <h3 class="text-xl font-bold text-white flex items-center gap-2">
+            <i class='bx bx-user-plus text-2xl'></i>
+            Crear Nuevo Docente
+          </h3>
+          <button (click)="closeModal()" class="text-white hover:text-gray-200 transition-colors">
+            <i class='bx bx-x text-3xl'></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Body -->
+      <div class="bg-white px-6 py-5">
+        <!-- Alert messages -->
+        <div *ngIf="formError" class="mb-4 bg-red-50 border border-red-200 rounded-lg p-4 flex items-start gap-3">
+          <i class='bx bx-error-circle text-red-600 text-2xl'></i>
+          <p class="text-red-700 text-sm">{{ formError }}</p>
+        </div>
+
+        <div *ngIf="formSuccess" class="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 flex items-start gap-3">
+          <i class='bx bx-check-circle text-green-600 text-2xl'></i>
+          <p class="text-green-700 text-sm">{{ formSuccess }}</p>
+        </div>
+
+        <!-- Form -->
+        <form class="space-y-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Primer Nombre -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Primer Nombre <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.firstName" name="firstName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Karla" required>
+            </div>
+
+            <!-- Segundo Nombre (Opcional) -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Segundo Nombre <span class="text-gray-400 text-xs">(Opcional)</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.middleName" name="middleName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Melissa">
+            </div>
+
+            <!-- Apellido Paterno -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Apellido Paterno <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.lastName" name="lastName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Corral" required>
+            </div>
+
+            <!-- Apellido Materno -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Apellido Materno <span class="text-red-500">*</span>
+              </label>
+              <input type="text" [(ngModel)]="teacherForm.secondLastName" name="secondLastName"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: Zarate" required>
+            </div>
+
+            <!-- Email -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Correo Electrónico <span class="text-red-500">*</span>
+              </label>
+              <input type="email" [(ngModel)]="teacherForm.email" name="email"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: ejemplo@upchiapas.edu.mx" required>
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Teléfono <span class="text-red-500">*</span>
+              </label>
+              <input type="tel" [(ngModel)]="teacherForm.phone" name="phone"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ej: 9613037813" required>
+            </div>
+
+            <!-- Contraseña -->
+            <div class="md:col-span-2">
+              <label class="block text-sm font-semibold text-gray-700 mb-1">
+                Contraseña <span class="text-red-500">*</span>
+              </label>
+              <input type="password" [(ngModel)]="teacherForm.password" name="password"
+                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                placeholder="Ingrese una contraseña segura" required>
+            </div>
+          </div>
+
+          <!-- Info box -->
+          <div class="bg-blue-50 border border-blue-200 rounded-lg p-4 flex items-start gap-3">
+            <i class='bx bx-info-circle text-blue-600 text-xl'></i>
+            <div class="text-sm text-blue-800">
+              <p class="font-semibold mb-1">Información importante:</p>
+              <ul class="list-disc list-inside space-y-1">
+                <li>Los campos marcados con <span class="text-red-500">*</span> son obligatorios</li>
+                <li>El docente será registrado con rol de <strong>Profesor (Teacher)</strong></li>
+                <li>El segundo nombre es opcional</li>
+              </ul>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- Footer -->
+      <div class="bg-gray-50 px-6 py-4 flex flex-col-reverse sm:flex-row gap-3 sm:justify-end">
+        <button type="button" (click)="closeModal()" [disabled]="isSubmitting"
+          class="w-full sm:w-auto px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+          Cancelar
+        </button>
+        <button type="button" (click)="submitTeacher()" [disabled]="!isFormValid() || isSubmitting"
+          class="w-full sm:w-auto px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <i class='bx bx-loader-alt bx-spin text-xl' *ngIf="isSubmitting"></i>
+          <i class='bx bx-save text-xl' *ngIf="!isSubmitting"></i>
+          {{ isSubmitting ? 'Creando...' : 'Crear Docente' }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

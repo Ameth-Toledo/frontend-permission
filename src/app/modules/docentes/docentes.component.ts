@@ -1,25 +1,54 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { FormsModule } from '@angular/forms';
 import { TitleService } from '../../services/title/title.service';
 import { DocentesService } from '../../services/docentes/docentes.service';
-import { Docente } from '../../models/docente';
+import { UsersService } from '../../services/users/users.service';
+import { RegisterRequest, RegisterResponse } from '../../models/user';
+
+interface CreateTeacherForm {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+  secondLastName: string;
+  email: string;
+  phone: string;
+  password: string;
+}
 
 @Component({
   selector: 'app-docentes',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './docentes.component.html',
   styleUrls: ['./docentes.component.css']
 })
 export class DocentesComponent implements OnInit {
-  teachers: Docente[] = [];
-  teachersFiltered: Docente[] = [];
+  teachers: any[] = [];
+  teachersFiltered: any[] = [];
   total: number = 0;
   isLoading: boolean = false;
   error: string = '';
   searchTerm: string = '';
   currentFilter: string = 'all';
+
+  // Modal state
+  showModal: boolean = false;
+  isSubmitting: boolean = false;
+  formError: string = '';
+  formSuccess: string = '';
+
+  // Form data
+  teacherForm: CreateTeacherForm = {
+    firstName: '',
+    middleName: '',
+    lastName: '',
+    secondLastName: '',
+    email: '',
+    phone: '',
+    password: ''
+  };
 
   roleFilters = [
     { label: 'Todos', value: 'all' },
@@ -30,6 +59,7 @@ export class DocentesComponent implements OnInit {
   constructor(
     private titleService: TitleService,
     private docentesService: DocentesService,
+    private usersService: UsersService,
     private router: Router
   ) { }
 
@@ -66,14 +96,12 @@ export class DocentesComponent implements OnInit {
   applyFilter() {
     let filtered = this.teachers;
 
-    // Filtrar por rol
     if (this.currentFilter !== 'all') {
       filtered = filtered.filter(teacher => 
         teacher.informacionRol.nombreRol === this.currentFilter
       );
     }
 
-    // Filtrar por búsqueda
     if (this.searchTerm) {
       const term = this.searchTerm.toLowerCase().trim();
       filtered = filtered.filter(teacher => {
@@ -143,19 +171,92 @@ export class DocentesComponent implements OnInit {
     }
   }
 
-  // 👇 NUEVO MÉTODO AGREGADO
   getCurrentFilterLabel(): string {
     const filter = this.roleFilters.find(f => f.value === this.currentFilter);
     return filter ? filter.label : 'Todos';
   }
 
-  verDetalle(teacher: Docente) {
+  verDetalle(teacher: any) {
     console.log('Ver detalle del docente:', teacher);
-    // Implementa la navegación aquí
     // this.router.navigate(['/docentes', teacher.teacherId]);
   }
 
   refreshTeachers() {
     this.loadTeachers();
+  }
+
+  // Modal methods
+  openModal() {
+    this.showModal = true;
+    this.resetForm();
+  }
+
+  closeModal() {
+    this.showModal = false;
+    this.resetForm();
+  }
+
+  resetForm() {
+    this.teacherForm = {
+      firstName: '',
+      middleName: '',
+      lastName: '',
+      secondLastName: '',
+      email: '',
+      phone: '',
+      password: ''
+    };
+    this.formError = '';
+    this.formSuccess = '';
+  }
+
+  isFormValid(): boolean {
+    return !!(
+      this.teacherForm.firstName.trim() &&
+      this.teacherForm.lastName.trim() &&
+      this.teacherForm.secondLastName.trim() &&
+      this.teacherForm.email.trim() &&
+      this.teacherForm.phone.trim() &&
+      this.teacherForm.password.trim()
+    );
+  }
+
+  submitTeacher() {
+    if (!this.isFormValid()) {
+      this.formError = 'Por favor, completa todos los campos obligatorios';
+      return;
+    }
+
+    this.isSubmitting = true;
+    this.formError = '';
+    this.formSuccess = '';
+
+    const registerData: RegisterRequest = {
+      firstName: this.teacherForm.firstName,
+      middleName: this.teacherForm.middleName || undefined,
+      lastName: this.teacherForm.lastName,
+      secondLastName: this.teacherForm.secondLastName,
+      email: this.teacherForm.email,
+      phone: this.teacherForm.phone,
+      password: this.teacherForm.password,
+      roleId: 2 // Teacher role
+    };
+
+    this.usersService.register(registerData).subscribe({
+      next: (response: RegisterResponse) => {
+        this.formSuccess = `Docente creado exitosamente: ${response.data.name}`;
+        this.isSubmitting = false;
+        
+        setTimeout(() => {
+          this.closeModal();
+          this.loadTeachers();
+        }, 1500);
+      },
+      error: (error: any) => {
+        console.error('Error al crear docente:', error);
+        this.formError = error.error?.message || 'Error al crear el docente. Por favor, intenta de nuevo.';
+        this.isSubmitting = false;
+      }
+    });
   }
 }

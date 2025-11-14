@@ -3,45 +3,30 @@
   <p class="mt-4 text-gray-600 font-medium">Cargando tutorados...</p>
 </div>
 
-<div *ngIf="error && !isLoading" class="mt-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+<div *ngIf="error && !isLoading" class="error-container mt-4 bg-red-50 border border-red-200 rounded-lg p-6 text-center">
   <i class='bx bx-error-circle text-4xl text-red-500'></i>
   <p class="mt-2 text-red-700 font-medium">{{ error }}</p>
   <button (click)="refreshStudents()"
-    class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+          (mouseenter)="onButtonHover($event, true)"
+          (mouseleave)="onButtonHover($event, false)"
+          class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
     Intentar de nuevo
   </button>
 </div>
 
 <div class="mt-4" *ngIf="!isLoading && !error">
   <div class="mb-6">
-    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+    <div class="header-section flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
       <span class="text-sm font-normal text-gray-500">Total de tutorados: ({{ total }} total)</span>
       <button (click)="refreshStudents()"
-        class="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="refresh-btn flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
         <i class='bx bx-refresh text-lg'></i>
         Actualizar
       </button>
     </div>
 
-    <!-- Barra de búsqueda 
-    <div class="relative">
-      <input 
-        type="text" 
-        [value]="searchTerm"
-        (input)="searchStudents($event)"
-        placeholder="Buscar por nombre, matrícula o email..."
-        class="w-full px-4 py-3 pl-12 pr-10 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent">
-      <i class='bx bx-search absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 text-xl'></i>
-      <button 
-        *ngIf="searchTerm"
-        (click)="clearSearch()"
-        class="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600">
-        <i class='bx bx-x text-2xl'></i>
-      </button>
-    </div>
-  </div>-->
-
-    <!-- Tabla -->
     <div class="overflow-x-auto shadow-md rounded-lg">
       <table class="min-w-full bg-white">
         <thead class="bg-gray-800 text-white">
@@ -56,7 +41,10 @@
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr *ngFor="let student of studentsFiltered" class="hover:bg-gray-50 transition-colors">
+          <tr *ngFor="let student of studentsFiltered" 
+              (mouseenter)="onRowHover($event, true)"
+              (mouseleave)="onRowHover($event, false)"
+              class="hover:bg-gray-50 transition-colors">
 
             <td class="py-3 px-4 text-sm">
               <div class="flex items-center gap-3">
@@ -116,8 +104,10 @@
             <td class="py-3 px-4 text-sm">
               <div class="flex gap-2 justify-center">
                 <button (click)="verDetalle(student)"
-                  class="p-2 rounded-lg hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
-                  title="Ver detalles del tutorado">
+                        (mouseenter)="onButtonHover($event, true)"
+                        (mouseleave)="onButtonHover($event, false)"
+                        class="p-2 rounded-lg hover:bg-blue-100 text-blue-600 hover:text-blue-800 transition-colors"
+                        title="Ver detalles del tutorado">
                   <i class='bx bx-show text-xl'></i>
                 </button>
               </div>
@@ -128,17 +118,19 @@
     </div>
 
     <div *ngIf="studentsFiltered.length === 0 && students.length > 0"
-      class="text-center py-12 bg-white rounded-lg shadow mt-4">
+      class="empty-state text-center py-12 bg-white rounded-lg shadow mt-4">
       <i class='bx bx-search-alt text-6xl text-gray-300'></i>
       <p class="mt-4 text-gray-500 text-lg font-medium">No se encontraron resultados</p>
       <p class="text-sm text-gray-400 mt-2">Intenta con otro término de búsqueda</p>
       <button (click)="clearSearch()"
-        class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
         Limpiar búsqueda
       </button>
     </div>
 
-    <div *ngIf="students.length === 0" class="text-center py-12 bg-white rounded-lg shadow mt-4">
+    <div *ngIf="students.length === 0" class="empty-state text-center py-12 bg-white rounded-lg shadow mt-4">
       <i class='bx bx-user-x text-6xl text-gray-300'></i>
       <p class="mt-4 text-gray-500 text-lg font-medium">No tienes tutorados asignados</p>
       <p class="text-sm text-gray-400 mt-2">Los estudiantes aparecerán aquí cuando se te asignen</p>
@@ -164,3 +156,4 @@
       </div>
     </div>
   </div>
+</div>

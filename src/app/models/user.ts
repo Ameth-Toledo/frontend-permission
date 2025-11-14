@@ -5,9 +5,12 @@ export interface User {
   lastName: string;
   secondLastName?: string;
   email: string;
-  phone: string;
-  password?: string;
+  phone?: string | null; 
+  password?: string; 
+  registrationDate?: string;
   roleId: number;
+  oauthProvider?: string | null; // 'google' | 'github' | null
+  oauthId?: string | null;
 }
 
 export interface RegisterRequest {
@@ -16,9 +19,9 @@ export interface RegisterRequest {
   lastName: string;
   secondLastName?: string;
   email: string;
-  phone: string;
-  password: string;
-  roleId: number;
+  phone?: string; 
+  password?: string; 
+  roleId?: number;
 }
 
 export interface RegisterResponse {

@@ -13,6 +13,7 @@ import { PermitionDetailComponent } from './modules/permition-detail/permition-d
 import { AuthCallbackComponent } from './modules/auth-callback/auth-callback.component';
 import { PermissionComponent } from './modules/permission/permission.component';
 import { TutoradoDetailComponent } from './modules/tutorado-detail/tutorado-detail.component';
+import { StudentComponent } from './modules/student/student.component';
 
 
 export const routes: Routes = [
@@ -30,5 +31,6 @@ export const routes: Routes = [
         { path: 'historial', component: HistorialComponent },
         { path: 'permition/detail/:matricule/:id', component: PermitionDetailComponent },
         { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent }
-    ]}
+    ]},
+    { path: 'student', component: StudentComponent }
 ];

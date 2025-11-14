@@ -22,7 +22,6 @@ export class RegistroComponent {
     email: '',
     phone: '',
     password: '',
-    roleId: 0
   };
 
   confirmPassword: string = '';
@@ -58,16 +57,32 @@ export class RegistroComponent {
     this.isLoading = true;
     this.errorMessage = '';
 
+    console.log('🔍 Datos a enviar:', {
+      firstName: this.userData.firstName,
+      middleName: this.userData.middleName,
+      lastName: this.userData.lastName,
+      secondLastName: this.userData.secondLastName,
+      email: this.userData.email,
+      phone: this.userData.phone,
+      roleId: this.userData.roleId,
+      password: '***' 
+    });
+
     this.usersService.register(this.userData).subscribe({
       next: (response) => {
-        console.log('Registro exitoso', response);
+        console.log('✅ Registro exitoso', response);
         alert('Registro exitoso. Ahora puedes iniciar sesión.');
         this.router.navigate(['']);
       },
       error: (error) => {
         this.isLoading = false;
+        
+        console.error('❌ Error completo:', error);
+        console.error('❌ Error status:', error.status);
+        console.error('❌ Error message:', error.error?.message);
+        console.error('❌ Error details:', error.error);
+        
         this.errorMessage = error.error?.error || error.error?.message || 'Error al registrarse';
-        console.error('Error en registro:', error);
       },
       complete: () => {
         this.isLoading = false;
@@ -95,6 +110,12 @@ export class RegistroComponent {
     if (this.userData.password.length < 6) {
       this.errorMessage = 'La contraseña debe tener al menos 6 caracteres';
       return false;
+    }
+
+    console.log('🔍 RoleId actual:', this.userData.roleId);
+    
+    if (this.userData.roleId === 0) {
+      console.warn('⚠️ roleId es 0, será determinado automáticamente por el backend');
     }
 
     return true;
