@@ -69,9 +69,12 @@
       </span>
     </button>
 
-    <button class="hover:opacity-80 transition-opacity">
+    <button 
+      (click)="navigateToProfile()"
+      class="hover:opacity-80 transition-opacity"
+      title="Ver mi perfil">
       <img src="assets/default_image.jpeg" alt="Perfil"
-           class="w-9 h-9 rounded-full object-cover border-2 border-gray-300">
+           class="w-9 h-9 rounded-full object-cover border-2 border-gray-300 cursor-pointer">
     </button>
   </div>
 </header>

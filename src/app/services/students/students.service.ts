@@ -3,7 +3,6 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../../environment/environment';
 
-// ✅ Interface que coincide con la respuesta del backend de Kotlin
 export interface Student {
   studentId: number;
   matricula: string;

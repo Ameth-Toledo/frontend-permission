@@ -5,6 +5,7 @@ import { NotifyService } from '../../services/notify/notify.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { Notify } from '../../models/notify';
 import { Subscription } from 'rxjs';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-header-student',
@@ -14,43 +15,41 @@ import { Subscription } from 'rxjs';
   styleUrl: './header-student.component.css'
 })
 export class HeaderStudentComponent implements OnInit, OnDestroy {
-  name: string = 'Toledo';
+  name: string = 'AuthGrid';
   showNotification: boolean = false;
+  showUserMenu: boolean = false;
   notifications: Notify[] = [];
   unreadCount: number = 0;
   
   private notificationsSubscription?: Subscription;
   private unreadCountSubscription?: Subscription;
   private currentUserId: number | null = null;
+  private currentStudentId: number | null = null;
 
   constructor(
     private notifyService: NotifyService,
-    private authService: AuthService
+    private authService: AuthService,
+    private router: Router
   ) {}
 
   ngOnInit() {
-    // Obtener el usuario logueado
     const currentUser = this.authService.getCurrentUser();
     
     if (currentUser && currentUser.userId) {
       this.currentUserId = currentUser.userId;
-      this.name = currentUser.name; // Actualizar el nombre del usuario
-      console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId})`);
+      this.currentStudentId = currentUser.studentId || null;
+      this.name = currentUser.name; 
+      console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId}, StudentID: ${this.currentStudentId})`);
       
-      // Solicitar permisos de notificación del navegador
       this.notifyService.requestNotificationPermission();
-      
-      // Conectar al WebSocket con el userId del usuario logueado
       this.notifyService.connect(currentUser.userId);
       
-      // Suscribirse a las notificaciones en tiempo real
       this.notificationsSubscription = this.notifyService.notifications$
         .subscribe(notifications => {
           this.notifications = notifications;
           console.log(`📋 Notificaciones actualizadas en header: ${notifications.length}`);
         });
       
-      // Suscribirse al contador de no leídas
       this.unreadCountSubscription = this.notifyService.unreadCount$
         .subscribe(count => {
           this.unreadCount = count;
@@ -64,10 +63,8 @@ export class HeaderStudentComponent implements OnInit, OnDestroy {
   ngOnDestroy() {
     console.log('🧹 Destruyendo HeaderStudentComponent...');
     
-    // Desconectar el WebSocket al destruir el componente
     this.notifyService.disconnect();
     
-    // Cancelar suscripciones
     if (this.notificationsSubscription) {
       this.notificationsSubscription.unsubscribe();
     }
@@ -78,6 +75,7 @@ export class HeaderStudentComponent implements OnInit, OnDestroy {
 
   toggleNotification() {
     this.showNotification = !this.showNotification;
+    this.showUserMenu = false;
     console.log(`🔔 Modal de notificaciones: ${this.showNotification ? 'abierto' : 'cerrado'}`);
   }
 
@@ -86,20 +84,50 @@ export class HeaderStudentComponent implements OnInit, OnDestroy {
     console.log('❌ Modal de notificaciones cerrado');
   }
 
+  toggleUserMenu() {
+    this.showUserMenu = !this.showUserMenu;
+    this.showNotification = false;
+    console.log(`👤 Menú de usuario: ${this.showUserMenu ? 'abierto' : 'cerrado'}`);
+  }
+
+  closeUserMenu() {
+    this.showUserMenu = false;
+    console.log('❌ Menú de usuario cerrado');
+  }
+
+  goToProfile() {
+    this.closeUserMenu();
+    
+    if (this.currentStudentId && this.name) {
+      const formattedName = this.name.replace(/\s+/g, '-').toLowerCase();
+      // Navega a la ruta: /profile/student/:id/:name
+      this.router.navigate(['/profile/student', this.currentStudentId, formattedName]);
+      console.log(`📝 Navegando a perfil del estudiante: ${this.currentStudentId} - ${formattedName}`);
+    } else {
+      console.error('❌ No se puede navegar al perfil: studentId no disponible');
+      // Fallback: navegar a la página principal del estudiante
+      this.router.navigate(['/student']);
+    }
+  }
+
+  logout() {
+    this.closeUserMenu();
+    console.log('👋 Cerrando sesión...');
+    this.authService.logout();
+  }
+
   markNotificationAsRead(notificationId: number) {
     console.log(`✅ Marcando notificación ${notificationId} como leída...`);
     
     this.notifyService.markAsRead(notificationId)
       .subscribe({
         next: () => {
-          // Actualizar la notificación localmente
           this.notifications = this.notifications.map(n => 
             n.notificationId === notificationId 
               ? { ...n, leido: true }
               : n
           );
           
-          // Actualizar el contador
           this.unreadCount = this.notifications.filter(n => !n.leido).length;
           
           console.log(`✅ Notificación ${notificationId} marcada como leída`);
@@ -119,11 +147,20 @@ export class HeaderStudentComponent implements OnInit, OnDestroy {
     this.notifyService.markAllAsRead(this.currentUserId)
       .subscribe({
         next: () => {
-          // Recargar notificaciones
           this.notifyService.loadNotifications(this.currentUserId!);
           console.log('✅ Todas las notificaciones marcadas como leídas');
         },
         error: (err) => console.error('❌ Error al marcar todas como leídas:', err)
       });
+  }
+
+  sendToHistory(event: Event) {
+    event.preventDefault();
+    this.router.navigate(['student/history'])
+  }
+
+  sendToHome(event: Event) {
+    event.preventDefault();
+    this.router.navigate(['student']);
   }
 }

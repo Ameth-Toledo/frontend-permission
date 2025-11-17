@@ -1,6 +1,7 @@
 .menu-item {
     position: relative;
 }
+
 .menu-item::after {
     content: '';
     position: absolute;
@@ -11,6 +12,22 @@
     background-color: #00A3E0;
     transition: width 0.3s ease;
 }
+
 .menu-item:hover::after {
     width: 100%;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.2s ease-out;
 }

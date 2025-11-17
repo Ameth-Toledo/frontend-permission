@@ -28,23 +28,31 @@ export class AuthCallbackComponent implements OnInit {
     this.route.queryParams.subscribe(params => {
       const token = params['token'];
       const userId = params['userId'];
+      const tutorId = params['tutorId'];      // ← NUEVO
+      const studentId = params['studentId'];  // ← NUEVO
+      const roleId = params['roleId'];        // ← NUEVO
       const name = params['name'];
       const email = params['email'];
 
-      if (token && userId && name && email) {
-        // Guardar datos de autenticación
+      if (token && userId && roleId && name && email) {
+        const decodedEmail = decodeURIComponent(email);
+        
         this.authService.saveAuthDataFromOAuth({
           token,
           userId: parseInt(userId),
+          tutorId: tutorId ? parseInt(tutorId) : undefined,      // ← NUEVO
+          studentId: studentId ? parseInt(studentId) : undefined, // ← NUEVO
+          roleId: parseInt(roleId),                               // ← NUEVO
           name: decodeURIComponent(name),
-          email: decodeURIComponent(email)
+          email: decodedEmail
         });
 
-        // 👇 Forzar recarga completa de la página
-        window.location.href = '/dashboard/welcome';
+        const redirectRoute = this.authService.getRedirectRoute(decodedEmail);
+
+        window.location.href = redirectRoute;
       } else {
-        // Si no hay token, redirigir al login con error
         console.error('Error: No se recibieron los datos de autenticación');
+        console.error('Datos recibidos:', { token, userId, roleId, tutorId, studentId, name, email });
         this.router.navigate(['/'], { 
           queryParams: { error: 'authentication_failed' } 
         });

@@ -7,17 +7,22 @@
         <h1 class="text-white text-2xl font-semibold flex-grow ml-6">AuthGrid</h1>
         
         <ul class="flex list-none gap-8">
+            <li (click)="sendToHome($event)" class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
+                <i class="bx bx-home"></i>
+                <span>Home</span>
+            </li>
             <li class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
                 <i class='bx bx-file'></i>
                 <span>Permisos</span>
             </li>
-            <li class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
+            <li (click)="sendToHistory($event)" class="text-white cursor-pointer transition-opacity menu-item flex items-center gap-2">
                 <i class='bx bx-history'></i>
                 <span>Historial</span>
             </li>
         </ul>
 
         <div class="flex items-center gap-4 ml-8">
+            <!-- Botón de notificaciones -->
             <button
                 (click)="toggleNotification()"
                 class="relative hover:bg-white/10 p-2 rounded-full transition-colors"
@@ -29,14 +34,45 @@
                 </span>
             </button>
             
-            <div class="flex items-center gap-3">
-                <span class="text-white font-medium">{{ name }}</span>
-                <img src="assets/default_image.jpeg" alt="Perfil"
-                     class="w-10 h-10 rounded-full object-cover border-2 border-white/50 hover:border-white transition-colors cursor-pointer">
+            <!-- Menú de usuario -->
+            <div class="relative">
+                <div class="flex items-center gap-3">
+                    <span class="text-white font-medium">{{ name }}</span>
+                    <img 
+                        (click)="toggleUserMenu()"
+                        src="assets/default_image.jpeg" 
+                        alt="Perfil"
+                        class="w-10 h-10 rounded-full object-cover border-2 border-white/50 hover:border-white transition-colors cursor-pointer">
+                </div>
+
+                <!-- Dropdown del menú de usuario -->
+                <div *ngIf="showUserMenu" 
+                     class="absolute right-0 mt-2 w-56 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50 animate-fade-in">
+                    
+                    <!-- Ver Perfil -->
+                    <button
+                        (click)="goToProfile()"
+                        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-gray-50 transition-colors text-gray-700 text-left border-b border-gray-100">
+                        <i class='bx bx-user text-xl text-[#003D6B]'></i>
+                        <span class="font-medium">Ver Perfil</span>
+                    </button>
+
+                    <button
+                        (click)="logout()"
+                        class="w-full flex items-center gap-3 px-4 py-3 hover:bg-red-50 transition-colors text-gray-700 text-left">
+                        <i class='bx bx-log-out text-xl text-red-500'></i>
+                        <span class="font-medium text-red-500">Cerrar Sesión</span>
+                    </button>
+                </div>
             </div>
         </div>
     </header>
 </div>
+
+<div *ngIf="showUserMenu" 
+     (click)="closeUserMenu()"
+     class="fixed inset-0 z-40"
+     style="background: transparent;"></div>
 
 <app-modal-notify
     [visible]="showNotification"

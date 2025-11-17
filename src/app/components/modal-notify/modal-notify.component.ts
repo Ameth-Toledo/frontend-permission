@@ -40,31 +40,31 @@ export class ModalNotifyComponent {
   }
 
   verPermiso(notification: Notify) {
-  console.log('1. Notificación completa:', notification);
-  console.log('2. informacionPermiso:', notification.informacionPermiso);
-  
-  if (!notification.informacionPermiso) {
-    console.error('❌ No hay información del permiso');
-    return;
+    console.log('1. Notificación completa:', notification);
+    console.log('2. informacionPermiso:', notification.informacionPermiso);
+
+    if (!notification.informacionPermiso) {
+      console.error('❌ No hay información del permiso');
+      return;
+    }
+
+    const matricula = notification.informacionPermiso.matricula;
+    const permitId = notification.informacionPermiso.permitId;
+
+    console.log('3. Matrícula:', matricula);
+    console.log('4. PermitId:', permitId);
+    console.log('5. Navegando a:', ['/dashboard/permition/detail', matricula, permitId]);
+
+    this.router.navigate(['/dashboard/permition/detail', matricula, permitId])
+      .then(success => {
+        console.log('6. Navegación exitosa:', success);
+        this.markAsRead.emit(notification.notificationId);
+        this.cerrarModal();
+      })
+      .catch(error => {
+        console.error('7. Error en navegación:', error);
+      });
   }
-
-  const matricula = notification.informacionPermiso.matricula;
-  const permitId = notification.informacionPermiso.permitId;
-
-  console.log('3. Matrícula:', matricula);
-  console.log('4. PermitId:', permitId);
-  console.log('5. Navegando a:', ['/dashboard/permition/detail', matricula, permitId]);
-
-  this.router.navigate(['/dashboard/permition/detail', matricula, permitId])
-    .then(success => {
-      console.log('6. Navegación exitosa:', success);
-      this.markAsRead.emit(notification.notificationId);
-      this.cerrarModal();
-    })
-    .catch(error => {
-      console.error('7. Error en navegación:', error);
-    });
-}
 
   marcarTodasComoLeidas() {
     console.log('Marcando todas como leídas desde modal');

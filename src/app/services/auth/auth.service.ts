@@ -34,20 +34,42 @@ export class AuthService {
     window.location.href = `${this.apiUrl}/github`;
   }
 
-  saveAuthDataFromOAuth(data: { token: string; userId: number; tutorId?: number; name: string; email: string }): void {
+  saveAuthDataFromOAuth(data: { 
+    token: string; 
+    userId: number; 
+    tutorId?: number; 
+    studentId?: number;  // ← NUEVO
+    roleId: number;      // ← NUEVO
+    name: string; 
+    email: string 
+  }): void {
     this.saveAuthData(data);
   }
 
-  private saveAuthData(data: { token: string; userId: number; tutorId?: number; name: string; email: string }): void {
+  private saveAuthData(data: { 
+    token: string; 
+    userId: number; 
+    tutorId?: number; 
+    studentId?: number;  // ← NUEVO
+    roleId: number;      // ← NUEVO
+    name: string; 
+    email: string 
+  }): void {
     localStorage.setItem(this.tokenKey, data.token);
+    
     const user: User = {
       userId: data.userId,
-      tutorId: data.tutorId, 
+      tutorId: data.tutorId,
+      studentId: data.studentId,  // ← NUEVO
+      roleId: data.roleId,        // ← NUEVO
       name: data.name,
       email: data.email
     };
+    
     localStorage.setItem(this.userKey, JSON.stringify(user));
     this.currentUserSubject.next(user);
+    
+    console.log('✅ Usuario guardado:', user);
   }
 
   getToken(): string | null {
@@ -65,6 +87,17 @@ export class AuthService {
 
   isAuthenticated(): boolean {
     return !!this.getToken();
+  }
+
+  getRedirectRoute(email: string): string {
+    const emailPrefix = email.split('@')[0];
+    const firstChar = emailPrefix.charAt(0);
+    
+    if (/^\d/.test(firstChar)) {
+      return '/student';
+    } else {
+      return '/dashboard/welcome';
+    }
   }
 
   logout(): void {

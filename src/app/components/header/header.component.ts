@@ -37,6 +37,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   private unreadCountSubscription?: Subscription;
   private searchSubscription?: Subscription;
   private currentUserId: number | null = null;
+  private currentTutorId: number | null = null;
+  private currentUserName: string = '';
 
   constructor(
     private titleService: TitleService,
@@ -86,7 +88,9 @@ export class HeaderComponent implements OnInit, OnDestroy {
     
     if (currentUser && currentUser.userId) {
       this.currentUserId = currentUser.userId;
-      console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId})`);
+      this.currentTutorId = currentUser.tutorId || null;
+      this.currentUserName = currentUser.name || '';
+      console.log(`👤 Usuario logueado: ${currentUser.name} (ID: ${currentUser.userId}, TutorID: ${this.currentTutorId})`);
       
       // Solicitar permisos de notificación del navegador
       this.notifyService.requestNotificationPermission();
@@ -107,6 +111,11 @@ export class HeaderComponent implements OnInit, OnDestroy {
           this.unreadCount = count;
           console.log(`🔢 Contador no leídas: ${count}`);
         });
+      
+      // Verificar estado de conexión después de 2 segundos
+      setTimeout(() => {
+        this.notifyService.getConnectionStatus();
+      }, 2000);
     } else {
       console.warn('⚠️ No hay usuario logueado, no se conectará al WebSocket');
     }
@@ -210,5 +219,15 @@ export class HeaderComponent implements OnInit, OnDestroy {
         },
         error: (err) => console.error('❌ Error al marcar todas como leídas:', err)
       });
+  }
+
+  // Navegar al perfil del usuario
+  navigateToProfile() {
+    if (this.currentTutorId && this.currentUserName) {
+      const formattedName = this.currentUserName.replace(/\s+/g, '-').toLowerCase();
+      this.router.navigate(['/dashboard/profile/docente', this.currentTutorId, formattedName]);
+    } else {
+      console.error('❌ No se puede navegar al perfil: tutorId no disponible');
+    }
   }
 }

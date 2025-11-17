@@ -14,6 +14,10 @@ import { AuthCallbackComponent } from './modules/auth-callback/auth-callback.com
 import { PermissionComponent } from './modules/permission/permission.component';
 import { TutoradoDetailComponent } from './modules/tutorado-detail/tutorado-detail.component';
 import { StudentComponent } from './modules/student/student.component';
+import { PerfilTutorComponent } from './modules/perfil-tutor/perfil-tutor.component';
+import { HistoryStudentComponent } from './modules/history-student/history-student.component';
+import { ProfileStudentComponent } from './modules/profile-student/profile-student.component';
+import { TemplateComponent } from './modules/template/template.component';
 
 
 export const routes: Routes = [
@@ -30,7 +34,11 @@ export const routes: Routes = [
         { path: 'docentes', component: DocentesComponent },
         { path: 'historial', component: HistorialComponent },
         { path: 'permition/detail/:matricule/:id', component: PermitionDetailComponent },
-        { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent }
+        { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent },
+        { path: 'profile/docente/:id/:name', component: PerfilTutorComponent },
+        { path: 'template', component: TemplateComponent }
     ]},
-    { path: 'student', component: StudentComponent }
+    { path: 'student', component: StudentComponent },
+    { path: 'student/history', component: HistoryStudentComponent },
+    { path: 'profile/student/:id/:name', component: ProfileStudentComponent },
 ];

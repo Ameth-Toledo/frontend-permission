@@ -1,5 +1,3 @@
-// src/app/models/auth.ts
-
 export interface LoginRequest {
   email: string;
   password: string;
@@ -10,7 +8,9 @@ export interface LoginResponse {
   data: {
     token: string;
     userId: number;
-    tutorId?: number;  
+    tutorId?: number;
+    studentId?: number;  
+    roleId: number;     
     name: string;
     email: string;
   };
@@ -18,7 +18,9 @@ export interface LoginResponse {
 
 export interface User {
   userId: number;
-  tutorId?: number; 
+  tutorId?: number;
+  studentId?: number;  
+  roleId?: number;    
   name: string;
   email: string;
 }

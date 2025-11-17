@@ -29,7 +29,11 @@ export class Login implements OnInit {
 
   ngOnInit(): void {
     if (this.authService.isAuthenticated()) {
-      this.router.navigate(['/dashboard/welcome']);
+      const currentUser = this.authService.getCurrentUser();
+      if (currentUser) {
+        const redirectRoute = this.authService.getRedirectRoute(currentUser.email);
+        this.router.navigate([redirectRoute]);
+      }
       return;
     }
 
@@ -84,7 +88,8 @@ export class Login implements OnInit {
     this.authService.login(this.credentials).subscribe({
       next: (response) => {
         console.log('Login exitoso', response);
-        this.router.navigate(['/dashboard/welcome']); 
+        const redirectRoute = this.authService.getRedirectRoute(response.data.email);
+        this.router.navigate([redirectRoute]); 
       },
       error: (error) => {
         this.isLoading = false;

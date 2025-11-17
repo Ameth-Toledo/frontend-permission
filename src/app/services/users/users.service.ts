@@ -10,7 +10,7 @@ import { User, RegisterRequest, RegisterResponse } from '../../models/user';
 export class UsersService {
   private apiUrl = `${environment.apiUrl}/api/users`;
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient) { }
 
   register(userData: RegisterRequest): Observable<RegisterResponse> {
     return this.http.post<RegisterResponse>(this.apiUrl, userData);
