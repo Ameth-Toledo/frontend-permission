@@ -1,6 +1,11 @@
 import { Injectable } from '@angular/core';
 import { environment } from '../../../environment/environment';
-import { Permition, PermitionsResponse } from '../../models/permition';
+import { 
+  Permition, 
+  PermitionsResponse, 
+  UpdatePermitDocumentUrlRequest, 
+  MessageResponse 
+} from '../../models/permition';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
@@ -12,53 +17,56 @@ export class PermitionService {
 
   constructor(private http: HttpClient) { }
 
-  // Obtener todos los permisos
   getAllPermits(): Observable<PermitionsResponse> {
     return this.http.get<PermitionsResponse>(this.apiUrl);
   }
 
-  // Obtener permisos por tutor ID
   getPermitsByTutor(tutorId: number): Observable<PermitionsResponse> {
     const params = new HttpParams().set('tutorId', tutorId.toString());
     return this.http.get<PermitionsResponse>(this.apiUrl, { params });
   }
 
-  // Obtener permisos por estudiante ID
   getPermitsByStudent(studentId: number): Observable<PermitionsResponse> {
     const params = new HttpParams().set('studentId', studentId.toString());
     return this.http.get<PermitionsResponse>(this.apiUrl, { params });
   }
 
-  // Obtener permisos por profesor ID
   getPermitsByTeacher(teacherId: number): Observable<PermitionsResponse> {
     const params = new HttpParams().set('teacherId', teacherId.toString());
     return this.http.get<PermitionsResponse>(this.apiUrl, { params });
   }
 
-  // Obtener permiso por ID
-  getPermitById(id: number): Observable<Permition> {
-    return this.http.get<Permition>(`${this.apiUrl}/${id}`);
+  getPermitById(id: number): Observable<{ permit: Permition }> {
+    return this.http.get<{ permit: Permition }>(`${this.apiUrl}/${id}`);
   }
 
-  // Crear permiso
-  createPermit(formData: FormData): Observable<Permition> {
-    return this.http.post<Permition>(this.apiUrl, formData);
+  createPermit(formData: FormData): Observable<any> {
+    return this.http.post(this.apiUrl, formData);
   }
 
-  // Actualizar permiso
-  updatePermit(id: number, data: Partial<Permition>): Observable<Permition> {
-    return this.http.put<Permition>(`${this.apiUrl}/${id}`, data);
+  updatePermit(id: number, data: Partial<Permition>): Observable<any> {
+    return this.http.put(`${this.apiUrl}/${id}`, data);
   }
 
-  // Eliminar permiso
-  deletePermit(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+  deletePermit(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`);
   }
 
-  // Actualizar estado del permiso
-  updatePermitStatus(id: number, status: 'approved' | 'rejected'): Observable<Permition> {
+  updatePermitStatus(id: number, status: 'approved' | 'rejected'): Observable<any> {
     const formData = new FormData();
     formData.append('status', status);
-    return this.http.put<Permition>(`${this.apiUrl}/${id}`, formData);
+    return this.http.put(`${this.apiUrl}/${id}`, formData);
+  }
+
+  updatePermitDocumentUrl(permitId: number, documentUrl: string): Observable<MessageResponse> {
+    const body: UpdatePermitDocumentUrlRequest = {
+      permitDocumentUrl: documentUrl
+    };
+    return this.http.put<MessageResponse>(`${this.apiUrl}/${permitId}/document-url`, body);
+  }
+
+  // Generar documento desde el backend
+  generatePermitDocument(permitId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${permitId}/generate-document`, {});
   }
 }

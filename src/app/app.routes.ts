@@ -17,8 +17,7 @@ import { StudentComponent } from './modules/student/student.component';
 import { PerfilTutorComponent } from './modules/perfil-tutor/perfil-tutor.component';
 import { HistoryStudentComponent } from './modules/history-student/history-student.component';
 import { ProfileStudentComponent } from './modules/profile-student/profile-student.component';
-import { TemplateComponent } from './modules/template/template.component';
-
+import { PermitsStudentComponent } from './modules/permits-student/permits-student.component';
 
 export const routes: Routes = [
     { path: '', redirectTo: '', pathMatch: 'full' },
@@ -36,9 +35,9 @@ export const routes: Routes = [
         { path: 'permition/detail/:matricule/:id', component: PermitionDetailComponent },
         { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent },
         { path: 'profile/docente/:id/:name', component: PerfilTutorComponent },
-        { path: 'template', component: TemplateComponent }
     ]},
     { path: 'student', component: StudentComponent },
     { path: 'student/history', component: HistoryStudentComponent },
     { path: 'profile/student/:id/:name', component: ProfileStudentComponent },
+    { path: 'permits/student', component: PermitsStudentComponent }
 ];

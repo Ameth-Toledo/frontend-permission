@@ -163,4 +163,9 @@ export class HeaderStudentComponent implements OnInit, OnDestroy {
     event.preventDefault();
     this.router.navigate(['student']);
   }
+
+  sendToPermits(event: Event) {
+    event.preventDefault();
+    this.router.navigate(['permits/student'])
+  }
 }

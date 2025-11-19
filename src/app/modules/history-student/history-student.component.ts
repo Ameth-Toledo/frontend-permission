@@ -17,10 +17,17 @@ import { History } from '../../models/history';
 export class HistoryStudentComponent implements OnInit {
   histories: History[] = [];
   historiesFiltered: History[] = [];
+  historiesToShow: History[] = []; // Historias de la página actual
   total: number = 0;
   isLoading: boolean = true;
   errorMessage: string = '';
   currentFilter: string = 'all';
+
+  // Paginación
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  totalPages: number = 0;
+  Math = Math;
 
   statusFilters = [
     { label: 'Todos', value: 'all' },
@@ -77,6 +84,7 @@ export class HistoryStudentComponent implements OnInit {
 
   filterByStatus(status: string) {
     this.currentFilter = status;
+    this.currentPage = 1; // Reiniciar a la primera página al cambiar filtro
     this.applyFilter();
   }
 
@@ -89,6 +97,67 @@ export class HistoryStudentComponent implements OnInit {
         return estadoNormalizado === this.currentFilter;
       });
     }
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.historiesFiltered.length / this.itemsPerPage);
+    
+    // Asegurar que currentPage no exceda totalPages
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    }
+    
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.historiesToShow = this.historiesFiltered.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5; // Mostrar máximo 5 números de página
+    
+    if (this.totalPages <= maxPagesToShow) {
+      // Si hay pocas páginas, mostrar todas
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Mostrar páginas alrededor de la página actual
+      let startPage = Math.max(1, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+      
+      if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      }
+      
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+    
+    return pages;
   }
 
   getCountByStatus(status: string): number {
@@ -148,6 +217,7 @@ export class HistoryStudentComponent implements OnInit {
   }
 
   refreshHistory() {
+    this.currentPage = 1;
     this.loadHistories();
   }
 }

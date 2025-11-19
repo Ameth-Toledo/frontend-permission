@@ -1,6 +1,10 @@
 <app-header-student></app-header-student>
 
 <div class="w-[90%] mx-auto px-4 py-6">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-[#003D6B] mb-2">Historial</h1>
+    <p class="text-gray-600">Visualiza toda la actividad reciente sobre tu permiso</p>
+  </div>
 
   <div *ngIf="isLoading" class="mt-4 text-center py-12 bg-white rounded-lg shadow">
     <i class='bx bx-loader-alt bx-spin text-5xl text-blue-600'></i>
@@ -52,11 +56,12 @@
             <th class="py-3 px-4 text-left text-sm font-semibold">Cuatrimestre</th>
             <th class="py-3 px-4 text-left text-sm font-semibold">Estado</th>
             <th class="py-3 px-4 text-left text-sm font-semibold">Fecha Solicitud</th>
-            <th class="py-3 px-4 text-center text-sm font-semibold">Acciones</th>
+            <th class="py-3 px-4 text-center text-sm font-semibold">Evidencia</th>
+            <th class="py-3 px-4 text-center text-sm font-semibold">Permiso</th>
           </tr>
         </thead>
         <tbody class="divide-y divide-gray-200">
-          <tr *ngFor="let history of historiesFiltered" class="hover:bg-gray-50 transition-colors">
+          <tr *ngFor="let history of historiesToShow" class="hover:bg-gray-50 transition-colors">
 
             <td class="py-3 px-4 text-sm">
               <div class="flex items-center gap-3">
@@ -132,15 +137,64 @@
                 </button>
               </div>
             </td>
+
+            <td class="py-3 px-4 text-sm">
+              <div class="flex gap-2 justify-center">
+                <button *ngIf="history.informacionPermiso.permitDocumentUrl"
+                  (click)="verEvidencia(history.informacionPermiso.permitDocumentUrl)"
+                  class="p-2 rounded-lg hover:bg-green-100 transition-colors" title="Ver permiso aprobado">
+                  <img src="assets/icon/image.png" alt="PDF" class="w-8 h-8">
+                </button>
+                <span *ngIf="!history.informacionPermiso.permitDocumentUrl" class="text-gray-400 text-xs italic">
+                  No generado
+                </span>
+              </div>
+            </td>
           </tr>
         </tbody>
       </table>
     </div>
 
+    <div *ngIf="historiesFiltered.length > 0"
+      class="mt-4 flex flex-col md:flex-row items-center justify-between gap-4 bg-white rounded-lg shadow p-4">
+      <div class="text-sm text-gray-600">
+        Mostrando <strong class="text-gray-900">{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> a
+        <strong class="text-gray-900">{{ Math.min(currentPage * itemsPerPage, historiesFiltered.length) }}</strong> de
+        <strong class="text-gray-900">{{ historiesFiltered.length }}</strong> registros
+      </div>
+
+      <div class="flex items-center gap-2">
+        <button (click)="previousPage()" [disabled]="currentPage === 1" [class.opacity-50]="currentPage === 1"
+          [class.cursor-not-allowed]="currentPage === 1"
+          class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:hover:bg-white"
+          title="Página anterior">
+          <i class='bx bx-chevron-left text-xl'></i>
+        </button>
+
+        <div class="flex gap-1">
+          <button *ngFor="let page of getPageNumbers()" (click)="goToPage(page)"
+            [class.bg-blue-600]="currentPage === page" [class.text-white]="currentPage === page"
+            [class.bg-white]="currentPage !== page" [class.text-gray-700]="currentPage !== page"
+            class="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm"
+            [class.hover:bg-blue-700]="currentPage === page">
+            {{ page }}
+          </button>
+        </div>
+
+        <button (click)="nextPage()" [disabled]="currentPage === totalPages"
+          [class.opacity-50]="currentPage === totalPages" [class.cursor-not-allowed]="currentPage === totalPages"
+          class="px-3 py-2 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors disabled:hover:bg-white"
+          title="Página siguiente">
+          <i class='bx bx-chevron-right text-xl'></i>
+        </button>
+      </div>
+    </div>
+
     <div *ngIf="historiesFiltered.length === 0 && histories.length > 0"
       class="text-center py-12 bg-white rounded-lg shadow mt-4">
       <i class='bx bx-filter-alt text-6xl text-gray-300'></i>
-      <p class="mt-4 text-gray-500 text-lg font-medium">No hay registros {{ getStatusText(currentFilter).toLowerCase() }}s
+      <p class="mt-4 text-gray-500 text-lg font-medium">No hay registros {{ getStatusText(currentFilter).toLowerCase()
+        }}s
       </p>
       <p class="text-sm text-gray-400 mt-2">Intenta con otro filtro</p>
       <button (click)="filterByStatus('all')"
@@ -160,8 +214,8 @@
         <div class="flex items-center gap-4">
           <span class="flex items-center gap-2">
             <i class='bx bx-info-circle text-blue-600'></i>
-            Mostrando: <strong class="text-gray-900">{{ historiesFiltered.length }}</strong> de <strong
-              class="text-gray-900">{{ total }}</strong>
+            Página <strong class="text-gray-900">{{ currentPage }}</strong> de <strong class="text-gray-900">{{
+              totalPages }}</strong>
           </span>
           <span class="flex items-center gap-2 text-xs px-3 py-1 bg-blue-50 text-blue-700 rounded-full">
             <i class='bx bx-filter'></i>
@@ -174,5 +228,4 @@
       </div>
     </div>
   </div>
-
 </div>

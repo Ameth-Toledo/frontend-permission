@@ -17,6 +17,7 @@ export class PermitionDetailComponent implements OnInit {
   permiso: Permition | null = null;
   isLoading: boolean = true;
   errorMessage: string = '';
+  isGeneratingPDF: boolean = false; 
 
   constructor(
     private route: ActivatedRoute,
@@ -25,9 +26,8 @@ export class PermitionDetailComponent implements OnInit {
   ) { }
 
   ngOnInit() {
-    // Capturar parámetros de la ruta (el parámetro en la ruta se llama 'id', no 'permitId')
     this.matricula = this.route.snapshot.paramMap.get('matricule') || '';
-    const permitIdParam = this.route.snapshot.paramMap.get('id'); // CAMBIO: usar 'id' en lugar de 'permitId'
+    const permitIdParam = this.route.snapshot.paramMap.get('id');
     
     if (permitIdParam) {
       this.permitId = parseInt(permitIdParam, 10);
@@ -114,9 +114,10 @@ export class PermitionDetailComponent implements OnInit {
 
       this.permitionService.updatePermitStatus(this.permiso.permitId, 'approved').subscribe({
         next: (response) => {
-          this.permiso = response;
-          this.isLoading = false;
-          alert('Permiso aprobado exitosamente');
+          console.log('✅ Permiso aprobado, generando documento...');
+          
+          // 🎯 Llamar al backend para generar el PDF
+          this.generatePermitDocument();
         },
         error: (error) => {
           console.error('Error al aprobar el permiso:', error);
@@ -125,6 +126,44 @@ export class PermitionDetailComponent implements OnInit {
         }
       });
     }
+  }
+
+  // 🎯 NUEVO: Generar documento desde el backend
+  private generatePermitDocument() {
+    this.isGeneratingPDF = true;
+    
+    this.permitionService.generatePermitDocument(this.permiso!.permitId).subscribe({
+      next: (response: any) => {
+        console.log('✅ Documento generado:', response);
+        
+        // Recargar los datos del permiso
+        this.permitionService.getPermitById(this.permiso!.permitId).subscribe({
+          next: (updatedResponse) => {
+            this.permiso = updatedResponse.permit;
+            this.isLoading = false;
+            this.isGeneratingPDF = false;
+            
+            alert('✅ Permiso aprobado y documento generado exitosamente');
+            
+            // Abrir el documento generado
+            if (this.permiso?.permitDocumentUrl) {
+              window.open(this.permiso.permitDocumentUrl, '_blank');
+            }
+          },
+          error: (error) => {
+            console.error('Error al recargar el permiso:', error);
+            this.isLoading = false;
+            this.isGeneratingPDF = false;
+          }
+        });
+      },
+      error: (error) => {
+        console.error('❌ Error al generar documento:', error);
+        alert('Error al generar el documento PDF');
+        this.isLoading = false;
+        this.isGeneratingPDF = false;
+      }
+    });
   }
 
   declinePermission() {
@@ -145,6 +184,13 @@ export class PermitionDetailComponent implements OnInit {
           this.isLoading = false;
         }
       });
+    }
+  }
+  
+  // Ver documento si ya existe
+  viewPermitDocument() {
+    if (this.permiso?.permitDocumentUrl) {
+      window.open(this.permiso.permitDocumentUrl, '_blank');
     }
   }
 }

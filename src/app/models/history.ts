@@ -2,6 +2,7 @@ export interface PermitInfo {
   permitId: number;
   descripcion: string;
   evidencia: string;
+  permitDocumentUrl: string;
   cuatrimestre: number;
 }
 
@@ -22,6 +23,7 @@ export interface History {
   estado: string;
   fechaSolicitud: string;
   informacionPermiso: PermitInfo;
+  permitDocumentUrl: string;
   informacionEstudiante: StudentInfo;
 }
 

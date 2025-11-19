@@ -36,9 +36,18 @@ export interface Permition {
   evidence: string;
   status: string;
   requestDate: string;
+  permitDocumentUrl: string | null;
 }
 
 export interface PermitionsResponse {
   permits: Permition[];
   total: number;
+}
+
+export interface UpdatePermitDocumentUrlRequest {
+  permitDocumentUrl: string;
+}
+
+export interface MessageResponse {
+  message: string;
 }

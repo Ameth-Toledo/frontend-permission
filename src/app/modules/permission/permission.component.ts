@@ -16,10 +16,16 @@ import { Permition } from '../../models/permition';
 export class PermissionComponent implements OnInit {
   permisos: Permition[] = [];
   permisosFiltered: Permition[] = [];
+  permisosToShow: Permition[] = []; 
   isLoading: boolean = true;
   errorMessage: string = '';
   currentFilter: string = 'all';
   tutorId: number | null = null;
+  Math = Math;
+  
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  totalPages: number = 0;
 
   statusFilters = [
     { label: 'Todos', value: 'all' },
@@ -42,7 +48,7 @@ export class PermissionComponent implements OnInit {
 
   loadTutorPermits() {
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser) {
       this.errorMessage = 'No hay usuario autenticado';
       this.isLoading = false;
@@ -58,7 +64,7 @@ export class PermissionComponent implements OnInit {
         this.permisos = response.permits.filter(
           permiso => permiso.tutor.userId === currentUser.userId
         );
-        
+
         if (this.permisos.length > 0) {
           this.tutorId = this.permisos[0].tutor.tutorId;
         }
@@ -77,6 +83,7 @@ export class PermissionComponent implements OnInit {
 
   filterByStatus(status: string) {
     this.currentFilter = status;
+    this.currentPage = 1; 
     this.applyFilter();
   }
 
@@ -88,6 +95,64 @@ export class PermissionComponent implements OnInit {
         permiso => permiso.status.toLowerCase() === this.currentFilter
       );
     }
+    this.updatePagination();
+  }
+
+  updatePagination() {
+    this.totalPages = Math.ceil(this.permisosFiltered.length / this.itemsPerPage);
+
+    if (this.currentPage > this.totalPages && this.totalPages > 0) {
+      this.currentPage = this.totalPages;
+    }
+
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    this.permisosToShow = this.permisosFiltered.slice(startIndex, endIndex);
+  }
+
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages) {
+      this.currentPage = page;
+      this.updatePagination();
+    }
+  }
+
+  nextPage() {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.updatePagination();
+    }
+  }
+
+  previousPage() {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.updatePagination();
+    }
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxPagesToShow = 5; 
+
+    if (this.totalPages <= maxPagesToShow) {
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      let startPage = Math.max(1, this.currentPage - 2);
+      let endPage = Math.min(this.totalPages, startPage + maxPagesToShow - 1);
+
+      if (endPage - startPage < maxPagesToShow - 1) {
+        startPage = Math.max(1, endPage - maxPagesToShow + 1);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        pages.push(i);
+      }
+    }
+
+    return pages;
   }
 
   getCountByStatus(status: string): number {
@@ -106,21 +171,20 @@ export class PermissionComponent implements OnInit {
 
   getFilterButtonClass(status: string): string {
     const baseClasses = 'px-4 py-2 rounded-lg font-medium text-sm transition-all duration-200';
-    
+
     if (this.currentFilter === status) {
       return `${baseClasses} bg-blue-600 text-white shadow-lg transform scale-105`;
     }
     return `${baseClasses} bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 hover:border-blue-300`;
   }
 
-  
   viewPermitDetail(permiso: Permition) {
     this.router.navigate(['dashboard/permition/detail', permiso.estudiante.numeroMatricula, permiso.permitId]);
   }
 
   deletePermit(permitId: number, event: Event) {
     event.stopPropagation();
-    
+
     if (confirm('¿Estás seguro de que deseas eliminar este permiso?')) {
       this.permitionService.deletePermit(permitId).subscribe({
         next: () => {
@@ -137,7 +201,7 @@ export class PermissionComponent implements OnInit {
   }
 
   getStatusClass(status: string): string {
-    switch(status.toLowerCase()) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return 'bg-green-100 text-green-800';
       case 'pending':
@@ -150,7 +214,7 @@ export class PermissionComponent implements OnInit {
   }
 
   getStatusText(status: string): string {
-    switch(status.toLowerCase()) {
+    switch (status.toLowerCase()) {
       case 'approved':
         return 'Aprobado';
       case 'pending':
@@ -163,6 +227,7 @@ export class PermissionComponent implements OnInit {
   }
 
   refreshPermits() {
+    this.currentPage = 1;
     this.loadTutorPermits();
   }
 }

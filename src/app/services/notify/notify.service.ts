@@ -249,7 +249,7 @@ export class NotifyService {
   }
 
   markAllAsRead(userId: number): Observable<any> {
-    return this.http.patch(`${this.API_URL}/user/${userId}/read-all`, {});
+    return this.http.put(`${this.API_URL}/user/${userId}/read-all`, {});
   }
 
   private showBrowserNotification(notification: Notify): void {
