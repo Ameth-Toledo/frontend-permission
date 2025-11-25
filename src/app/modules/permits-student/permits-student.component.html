@@ -1,159 +1,191 @@
 <app-header-student></app-header-student>
 
-<div class="w-[90%] mx-auto px-4 py-6">
-  <!-- Header -->
-  <div class="mb-8">
-    <div class="flex items-center justify-between">
-      <div>
-        <h1 class="text-3xl font-bold text-[#003D6B] mb-2">Permisos Aprobados</h1>
-        <p class="text-gray-600">Consulta y descarga tus permisos aprobados</p>
+<div class="min-h-screen from-slate-50 via-blue-50 to-indigo-50">
+  <div class="w-[90%] mx-auto px-4 py-8">
+    
+    <!-- Header Minimalista -->
+    <div class="mb-12">
+      <div class="flex items-center justify-between flex-wrap gap-6">
+        <div class="space-y-3">
+          <div class="mb-8">
+      <h1 class="text-3xl font-bold text-[#003D6B] mb-2">Generar Permiso</h1>
+      <p class="text-gray-600">Consultar todos tus permisos</p>
+    </div>
+        
+        <button 
+          (click)="refreshPermits()"
+          class="group px-5 py-2.5 bg-[#003D6B] text-white rounded-full font-medium text-sm hover:bg-[#0056a3] transition-all duration-300 hover:scale-105 hover:shadow-lg hover:shadow-[#003D6B]/20 flex items-center gap-2">
+          <i class='bx bx-refresh text-lg group-hover:rotate-180 transition-transform duration-500'></i>
+          Actualizar
+        </button>
       </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-24">
+      <div class="relative">
+        <div class="w-16 h-16 border-4 border-[#003D6B]/20 border-t-[#003D6B] rounded-full animate-spin"></div>
+      </div>
+      <p class="mt-6 text-gray-600 font-medium">Cargando permisos...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="errorMessage && !isLoading" class="max-w-2xl mx-auto text-center py-16 px-6 bg-white/60 backdrop-blur rounded-3xl border border-red-200">
+      <div class="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+        <i class='bx bx-error-circle text-3xl text-red-500'></i>
+      </div>
+      <h3 class="text-xl font-bold text-red-900 mb-2">Error al cargar</h3>
+      <p class="text-red-700 mb-6">{{ errorMessage }}</p>
       <button 
         (click)="refreshPermits()"
-        class="flex items-center gap-2 px-4 py-2 bg-[#003D6B] text-white rounded-lg hover:bg-[#002B4D] transition-colors shadow-md">
-        <i class='bx bx-refresh text-lg'></i>
-        Actualizar
+        class="px-6 py-3 bg-red-600 text-white rounded-full hover:bg-red-700 transition-all font-semibold hover:scale-105">
+        Reintentar
       </button>
     </div>
-  </div>
 
-  <!-- Loading State -->
-  <div *ngIf="isLoading" class="text-center py-12 bg-white rounded-lg shadow">
-    <i class='bx bx-loader-alt bx-spin text-5xl text-[#003D6B]'></i>
-    <p class="mt-4 text-gray-600 font-medium">Cargando permisos...</p>
-  </div>
-
-  <!-- Error State -->
-  <div *ngIf="errorMessage && !isLoading" class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-    <i class='bx bx-error-circle text-4xl text-red-500'></i>
-    <p class="mt-2 text-red-700 font-medium">{{ errorMessage }}</p>
-    <button 
-      (click)="refreshPermits()"
-      class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
-      Intentar de nuevo
-    </button>
-  </div>
-
-  <!-- Permisos Grid -->
-  <div *ngIf="!isLoading && !errorMessage" class="space-y-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <!-- Lista de Permisos - Diseño de Lista Moderna -->
+    <div *ngIf="!isLoading && !errorMessage" class="space-y-6">
+      
+      <!-- Item de Permiso -->
       <div 
-        *ngFor="let permit of approvedPermits" 
-        class="bg-white rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 border-gray-100 hover:border-[#003D6B]/20">
+        *ngFor="let permit of paginatedPermits" 
+        class="group relative bg-white/80 backdrop-blur hover:bg-white transition-all duration-500 rounded-3xl overflow-hidden border border-gray-200/50 hover:border-[#003D6B]/30 hover:shadow-2xl hover:shadow-[#003D6B]/5">
         
-        <!-- Card Content -->
-        <div class="p-6 space-y-4">
-          <!-- Header con ID y Badge -->
-          <div class="flex items-start justify-between mb-2">
-            <div class="flex items-center gap-3">
-              <div class="bg-[#003D6B]/10 rounded-xl p-3">
-                <i class='bx bxs-file-doc text-2xl text-[#003D6B]'></i>
+        <!-- Barra lateral de color -->
+        <div class="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-green-400 via-green-500 to-emerald-600 group-hover:w-2 transition-all duration-300"></div>
+        
+        <div class="pl-8 pr-6 py-6">
+          <div class="flex flex-col lg:flex-row lg:items-center gap-6">
+            
+            <!-- Sección Principal: Info del Permiso -->
+            <div class="flex-1 space-y-4">
+              
+              <!-- Header: ID y Estado -->
+              <div class="flex items-start justify-between gap-4">
+                <div class="flex items-center gap-4">
+                  <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#003D6B] to-[#0056a3] flex items-center justify-center shadow-lg">
+                    <i class='bx bxs-file-doc text-2xl text-white'></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-400 font-semibold uppercase tracking-wider">Permiso</p>
+                    <h3 class="text-2xl font-black text-[#003D6B]">#{{ permit.permitId }}</h3>
+                  </div>
+                </div>
+                <span class="px-4 py-1.5 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-bold rounded-full shadow-md flex items-center gap-1.5 whitespace-nowrap">
+                  <i class='bx bxs-check-circle'></i>
+                  APROBADO
+                </span>
               </div>
+
+              <!-- Motivo - Grande y destacado -->
               <div>
-                <p class="text-xs text-gray-500 font-medium">Permiso</p>
-                <p class="text-lg font-bold text-[#003D6B]">#{{ permit.permitId }}</p>
+                <h4 class="text-2xl font-bold text-gray-900 leading-tight mb-1">
+                  {{ permit.reason }}
+                </h4>
+                <p class="text-gray-600 text-sm leading-relaxed line-clamp-2">
+                  {{ permit.description }}
+                </p>
+              </div>
+
+              <!-- Info Grid Inline -->
+              <div class="flex flex-wrap items-center gap-6 pt-2">
+                
+                <!-- Fecha Inicio -->
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                    <i class='bx bx-calendar text-blue-600 text-lg'></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 font-semibold">Desde</p>
+                    <p class="text-sm font-bold text-gray-900">{{ permit.startDate | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                </div>
+
+                <!-- Separador -->
+                <div class="hidden sm:block w-px h-10 bg-gray-200"></div>
+
+                <!-- Fecha Fin -->
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-green-50 flex items-center justify-center">
+                    <i class='bx bx-calendar-check text-green-600 text-lg'></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 font-semibold">Hasta</p>
+                    <p class="text-sm font-bold text-gray-900">{{ permit.endDate | date:'dd/MM/yyyy' }}</p>
+                  </div>
+                </div>
+
+                <!-- Separador -->
+                <div class="hidden sm:block w-px h-10 bg-gray-200"></div>
+
+                <!-- Cuatrimestre -->
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-xl bg-indigo-50 flex items-center justify-center">
+                    <i class='bx bx-book text-indigo-600 text-lg'></i>
+                  </div>
+                  <div>
+                    <p class="text-xs text-gray-500 font-semibold">Cuatrimestre</p>
+                    <p class="text-sm font-bold text-gray-900">{{ permit.cuatrimestre }}°</p>
+                  </div>
+                </div>
+
+                <!-- Separador -->
+                <div class="hidden sm:block w-px h-10 bg-gray-200"></div>
+
+                <!-- Tutor -->
+                <div class="flex items-center gap-2.5">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center text-white shadow-md flex-shrink-0">
+                    <i class='bx bxs-user-detail text-lg'></i>
+                  </div>
+                  <div class="min-w-0">
+                    <p class="text-xs text-gray-500 font-semibold">Tutor</p>
+                    <p class="text-sm font-bold text-gray-900">{{ permit.tutor.nombreCompleto }}</p>
+                    <p class="text-xs text-gray-600 truncate">{{ permit.tutor.email }}</p>
+                  </div>
+                </div>
               </div>
             </div>
-            <span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1">
-              <i class='bx bx-check-circle'></i>
-              Aprobado
-            </span>
-          </div>
 
-          <!-- Motivo destacado -->
-          <div class="bg-gradient-to-br from-[#003D6B]/5 to-[#003D6B]/10 rounded-xl p-4">
-            <p class="text-xs text-[#003D6B]/70 font-semibold mb-1 uppercase tracking-wide">Motivo</p>
-            <p class="text-[#003D6B] font-bold text-xl">{{ permit.reason }}</p>
-          </div>
-
-          <!-- Descripción -->
-          <div>
-            <p class="text-xs text-gray-500 font-semibold mb-2 uppercase tracking-wide">Descripción</p>
-            <p class="text-gray-700 text-sm leading-relaxed line-clamp-2" [title]="permit.description">
-              {{ permit.description }}
-            </p>
-          </div>
-
-          <!-- Fechas en layout horizontal -->
-          <div class="flex gap-3">
-            <div class="flex-1 bg-blue-50 rounded-xl p-3 border border-blue-100">
-              <p class="text-xs text-blue-600 font-bold mb-1 flex items-center gap-1">
-                <i class='bx bx-calendar'></i>
-                Inicio
-              </p>
-              <p class="text-sm font-bold text-gray-900">{{ permit.startDate | date:'dd/MM/yyyy' }}</p>
-            </div>
-            <div class="flex-1 bg-green-50 rounded-xl p-3 border border-green-100">
-              <p class="text-xs text-green-600 font-bold mb-1 flex items-center gap-1">
-                <i class='bx bx-calendar-check'></i>
-                Fin
-              </p>
-              <p class="text-sm font-bold text-gray-900">{{ permit.endDate | date:'dd/MM/yyyy' }}</p>
-            </div>
-            <div class="flex-1 bg-indigo-50 rounded-xl p-3 border border-indigo-100">
-              <p class="text-xs text-indigo-600 font-bold mb-1 flex items-center gap-1">
-                <i class='bx bx-book'></i>
-                Cuatr.
-              </p>
-              <p class="text-sm font-bold text-gray-900">{{ permit.cuatrimestre }}°</p>
-            </div>
-          </div>
-
-          <!-- Tutor -->
-          <div class="bg-purple-50 rounded-xl p-4 border border-purple-100">
-            <p class="text-xs text-purple-600 font-semibold mb-2 uppercase tracking-wide flex items-center gap-1">
-              <i class='bx bxs-user-badge'></i>
-              Tutor asignado
-            </p>
-            <div class="flex items-center gap-3">
-              <div class="bg-purple-600 text-white rounded-full w-10 h-10 flex items-center justify-center font-bold text-sm">
-                {{ permit.tutor.nombreCompleto.charAt(0) }}
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-bold text-gray-900 truncate">{{ permit.tutor.nombreCompleto }}</p>
-                <p class="text-xs text-gray-600 truncate">{{ permit.tutor.email }}</p>
-              </div>
-            </div>
-          </div>
-
-          <!-- Botones de acción -->
-          <div class="pt-2">
-            <div class="flex gap-2">
+            <!-- Sección de Acciones - Vertical con Botones Originales -->
+            <div class="flex lg:flex-col gap-2 lg:border-l lg:pl-6 lg:border-gray-200">
+              
               <!-- Botón Ver PDF -->
               <button 
                 *ngIf="permit.permitDocumentUrl"
                 (click)="verPermisoPDF(permit.permitDocumentUrl)"
-                class="flex-1 flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
+                class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
                        bg-[#003D6B]/[0.068] border border-transparent
                        text-[#003D6B]/70 font-semibold text-[0.9rem]
                        transition-all duration-200 ease-in-out
                        shadow-[0_0_20px_rgba(0,61,107,0.397)]
                        hover:border-[#003D6B]/[0.623]
                        hover:shadow-[0_6px_0_rgba(0,61,107,0.623)] hover:-translate-y-[6px]
-                       active:translate-y-[2px] active:shadow-none"
+                       active:translate-y-[2px] active:shadow-none
+                       whitespace-nowrap"
                 style="text-shadow: 0 0 20px rgba(0, 61, 107, 0.397);">
                 <i class='bx bxs-file-pdf text-xl'></i>
-                Ver
+                <span>Ver PDF</span>
               </button>
 
               <!-- Botón Descargar -->
               <button 
                 *ngIf="permit.permitDocumentUrl"
                 (click)="descargarPermiso(permit.permitDocumentUrl, permit.permitId)"
-                class="flex-1 flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
+                class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
                        bg-[#003D6B]/[0.068] border border-transparent
                        text-[#003D6B]/70 font-semibold text-[0.9rem]
                        transition-all duration-200 ease-in-out
                        shadow-[0_0_20px_rgba(0,61,107,0.397)]
                        hover:border-[#003D6B]/[0.623]
                        hover:shadow-[0_6px_0_rgba(0,61,107,0.623)] hover:-translate-y-[6px]
-                       active:translate-y-[2px] active:shadow-none"
+                       active:translate-y-[2px] active:shadow-none
+                       whitespace-nowrap"
                 style="text-shadow: 0 0 20px rgba(0, 61, 107, 0.397);"
                 title="Descargar PDF">
                 <svg
                   viewBox="0 0 256 256"
-                  height="32"
-                  width="38"
+                  height="24"
+                  width="24"
                   xmlns="http://www.w3.org/2000/svg"
                   class="fill-current">
                   <path
@@ -161,62 +193,121 @@
                     fill="currentColor">
                   </path>
                 </svg>
+                <span>Descargar</span>
               </button>
 
               <!-- Ver Evidencia -->
               <button 
                 *ngIf="permit.evidence"
                 (click)="verEvidencia(permit.evidence)"
-                class="flex-1 flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
+                class="flex-1 lg:flex-none flex items-center justify-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
                        bg-purple-600/[0.068] border border-transparent
                        text-purple-600/70 font-semibold text-[0.9rem]
                        transition-all duration-200 ease-in-out
                        shadow-[0_0_20px_rgba(147,51,234,0.397)]
                        hover:border-purple-600/[0.623]
                        hover:shadow-[0_6px_0_rgba(147,51,234,0.623)] hover:-translate-y-[6px]
-                       active:translate-y-[2px] active:shadow-none"
+                       active:translate-y-[2px] active:shadow-none
+                       whitespace-nowrap"
                 style="text-shadow: 0 0 20px rgba(147, 51, 234, 0.397);"
                 title="Ver evidencia">
                 <i class='bx bx-image-alt text-xl'></i>
+                <span>Evidencia</span>
               </button>
+
+              <!-- Sin documento -->
+              <div *ngIf="!permit.permitDocumentUrl" class="text-center py-3 px-4 bg-amber-50 rounded-2xl border border-amber-200">
+                <p class="text-xs text-amber-700 font-semibold flex items-center justify-center gap-2">
+                  <i class='bx bx-time-five'></i>
+                  En proceso
+                </p>
+              </div>
             </div>
 
-            <!-- Mensaje si no hay PDF -->
-            <div *ngIf="!permit.permitDocumentUrl" class="text-center py-3 mt-2">
-              <p class="text-xs text-gray-500 italic flex items-center justify-center gap-2">
-                <i class='bx bx-info-circle text-base'></i>
-                Documento aún no generado
-              </p>
-            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Empty State -->
-    <div *ngIf="approvedPermits.length === 0" class="text-center py-16 bg-white rounded-lg shadow">
-      <div class="max-w-md mx-auto">
-        <div class="bg-gray-100 rounded-full w-24 h-24 flex items-center justify-center mx-auto mb-4">
-          <i class='bx bx-folder-open text-5xl text-gray-400'></i>
+      <!-- Empty State -->
+      <div *ngIf="approvedPermits.length === 0" class="text-center py-24 bg-white/60 backdrop-blur rounded-3xl border border-gray-200">
+        <div class="max-w-lg mx-auto px-6">
+          <div class="w-24 h-24 bg-gradient-to-br from-gray-100 to-gray-200 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <i class='bx bx-folder-open text-5xl text-gray-400'></i>
+          </div>
+          <h3 class="text-3xl font-bold text-gray-900 mb-3">Sin permisos aprobados</h3>
+          <p class="text-gray-500 text-lg mb-8 leading-relaxed">
+            Cuando tu tutor apruebe un permiso, aparecerá aquí
+          </p>
+          <button 
+            (click)="irAHistorial()"
+            class="inline-flex items-center gap-2 px-[15px] py-[10px] rounded-[5px] overflow-hidden
+                   bg-[#003D6B]/[0.068] border border-transparent
+                   text-[#003D6B]/70 font-semibold text-[0.9rem]
+                   transition-all duration-200 ease-in-out
+                   shadow-[0_0_20px_rgba(0,61,107,0.397)]
+                   hover:border-[#003D6B]/[0.623]
+                   hover:shadow-[0_6px_0_rgba(0,61,107,0.623)] hover:-translate-y-[6px]
+                   active:translate-y-[2px] active:shadow-none"
+            style="text-shadow: 0 0 20px rgba(0, 61, 107, 0.397);">
+            <i class='bx bx-history text-xl'></i>
+            <span>Ver historial completo</span>
+          </button>
         </div>
-        <h3 class="text-xl font-bold text-gray-900 mb-2">No hay permisos aprobados</h3>
-        <p class="text-gray-500 mb-6">
-          Tus permisos aprobados aparecerán aquí una vez que sean autorizados por tu tutor
-        </p>
-        <button 
-          (click)="irAHistorial()"
-          class="px-[15px] py-[10px] rounded-[5px] overflow-hidden
-                 bg-[#003D6B]/[0.068] border border-transparent
-                 text-[#003D6B]/70 font-semibold text-[0.9rem]
-                 transition-all duration-200 ease-in-out
-                 shadow-[0_0_20px_rgba(0,61,107,0.397)]
-                 hover:border-[#003D6B]/[0.623]
-                 hover:shadow-[0_6px_0_rgba(0,61,107,0.623)] hover:-translate-y-[6px]
-                 active:translate-y-[2px] active:shadow-none"
-          style="text-shadow: 0 0 20px rgba(0, 61, 107, 0.397);">
-          Ver historial completo
-        </button>
       </div>
+
+      <!-- Paginación -->
+      <div *ngIf="approvedPermits.length > 0" class="flex items-center justify-between mt-8 px-4 py-6 bg-white/60 backdrop-blur rounded-3xl border border-gray-200">
+        
+        <!-- Info de resultados -->
+        <div class="text-sm text-gray-600">
+          Mostrando <span class="font-bold text-[#003D6B]">{{ (currentPage - 1) * itemsPerPage + 1 }}</span> 
+          a <span class="font-bold text-[#003D6B]">{{ Math.min(currentPage * itemsPerPage, approvedPermits.length) }}</span> 
+          de <span class="font-bold text-[#003D6B]">{{ approvedPermits.length }}</span> permisos
+        </div>
+
+        <!-- Controles de paginación -->
+        <div class="flex items-center gap-2">
+          
+          <!-- Botón Anterior -->
+          <button 
+            (click)="previousPage()"
+            [disabled]="currentPage === 1"
+            [class.opacity-50]="currentPage === 1"
+            [class.cursor-not-allowed]="currentPage === 1"
+            class="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-[#003D6B]/30 hover:bg-[#003D6B]/5 disabled:hover:border-gray-200 disabled:hover:bg-white">
+            <i class='bx bx-chevron-left text-xl'></i>
+            <span class="hidden sm:inline">Anterior</span>
+          </button>
+
+          <!-- Números de página -->
+          <div class="flex items-center gap-1">
+            <button 
+              *ngFor="let page of getPageNumbers()"
+              (click)="goToPage(page)"
+              [ngClass]="{
+                'bg-gradient-to-r from-[#003D6B] to-[#0056a3] text-white shadow-lg': currentPage === page,
+                'bg-white text-gray-700 border-2 border-gray-200 hover:border-[#003D6B]/30 hover:bg-[#003D6B]/5': currentPage !== page
+              }"
+              class="w-10 h-10 rounded-xl font-bold text-sm transition-all duration-300"
+              [style.box-shadow]="currentPage === page ? '0 10px 15px -3px rgba(0, 61, 107, 0.3)' : ''">
+              {{ page }}
+            </button>
+          </div>
+
+          <!-- Botón Siguiente -->
+          <button 
+            (click)="nextPage()"
+            [disabled]="currentPage === totalPages"
+            [class.opacity-50]="currentPage === totalPages"
+            [class.cursor-not-allowed]="currentPage === totalPages"
+            class="flex items-center gap-2 px-4 py-2 bg-white border-2 border-gray-200 text-gray-700 rounded-xl font-semibold text-sm transition-all duration-300 hover:border-[#003D6B]/30 hover:bg-[#003D6B]/5 disabled:hover:border-gray-200 disabled:hover:bg-white">
+            <span class="hidden sm:inline">Siguiente</span>
+            <i class='bx bx-chevron-right text-xl'></i>
+          </button>
+
+        </div>
+      </div>
+
     </div>
   </div>
 </div>

@@ -11,6 +11,7 @@ export interface Tutor {
     descripcion: string;
   };
   fecha_registro: string;
+  firma_url: string;
 }
 
 export interface TutorsResponse {

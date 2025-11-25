@@ -1,0 +1,105 @@
+<div class="container mx-auto px-4 py-6">
+  <div *ngIf="isLoading" class="text-center py-12">
+    <i class='bx bx-loader-alt bx-spin text-5xl text-blue-600'></i>
+    <p class="mt-4 text-gray-600 font-medium">Cargando información del tutorado...</p>
+  </div>
+
+  <div *ngIf="error && !isLoading" class="error-container bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+    <i class='bx bx-error-circle text-4xl text-red-500'></i>
+    <p class="mt-2 text-red-700 font-medium">{{ error }}</p>
+    <button (click)="goBack()" 
+            class="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors">
+      Volver a la lista
+    </button>
+  </div>
+
+  <div *ngIf="student && !isLoading && !error">
+    <div class="detail-header mb-6 flex items-center justify-between">
+      <button (click)="goBack()" 
+              class="flex items-center gap-2 p-2 rounded-lg hover:bg-gray-100 transition-colors">
+        <i class='bx bx-arrow-back text-2xl text-gray-700'></i>
+        <span class="text-gray-700 font-medium">Regresar</span>
+      </button>
+      
+      <button (click)="refreshStudent()"
+              (mouseenter)="onButtonHover($event, true)"
+              (mouseleave)="onButtonHover($event, false)"
+              class="refresh-btn flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-md hover:shadow-lg">
+        <i class='bx bx-refresh text-lg'></i>
+        Actualizar
+      </button>
+    </div>
+
+    <div class="detail-card rounded-lg p-6 mb-6">
+      <div class="flex items-center gap-4 mb-6 pb-4 border-b border-gray-200">
+        <div class="flex-shrink-0 h-20 w-20 bg-blue-100 rounded-full flex items-center justify-center">
+          <i class='bx bxs-user text-blue-600 text-4xl'></i>
+        </div>
+        <div class="flex-grow">
+          <h2 class="text-2xl font-bold text-gray-900">{{ student.informacionPersonal.nombreCompleto }}</h2>
+          <p class="text-sm text-gray-500">ID: {{ student.studentId }}</p>
+          <span *ngIf="student.matricula" 
+                class="inline-flex items-center gap-1 px-3 py-1 mt-2 bg-indigo-50 text-indigo-700 rounded-full font-medium text-sm">
+            <i class='bx bx-id-card'></i>
+            {{ student.matricula }}
+          </span>
+        </div>
+      </div>
+
+      <h3 class="text-lg font-semibold text-gray-800 mb-4 flex items-center gap-2">
+        <i class='bx bxs-user-detail text-blue-600'></i>
+        Información Personal
+      </h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Email</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bx-envelope text-gray-400'></i>
+            <p class="text-gray-900">{{ student.informacionPersonal.email }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Teléfono</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bx-phone text-green-600'></i>
+            <p class="text-gray-900">{{ student.informacionPersonal.telefono || 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Teléfono Tutor Familiar</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bxs-phone-call text-purple-600'></i>
+            <p class="text-gray-900">{{ student.telefonoTutorFamiliar || 'N/A' }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Fecha de Registro</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bx-time text-blue-600'></i>
+            <p class="text-gray-900">{{ student.fechaRegistro | date:'dd/MM/yyyy HH:mm' }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Rol</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bx-user-circle text-indigo-600'></i>
+            <p class="text-gray-900">{{ student.informacionRol.nombreRol }}</p>
+          </div>
+        </div>
+
+        <div class="info-item">
+          <label class="text-sm font-medium text-gray-500 uppercase tracking-wide">Descripción del Rol</label>
+          <div class="flex items-center gap-2 mt-1">
+            <i class='bx bx-info-circle text-blue-600'></i>
+            <p class="text-gray-900">{{ student.informacionRol.descripcion }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

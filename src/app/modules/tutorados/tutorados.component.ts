@@ -28,7 +28,7 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
     private authService: AuthService,
     private router: Router
   ) { }
-  
+
   ngOnInit() {
     this.titleService.setTitle('Mis Tutorados');
     this.loadStudents();
@@ -116,7 +116,7 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
     this.error = '';
 
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser) {
       this.error = 'No hay usuario logueado';
       this.isLoading = false;
@@ -127,15 +127,15 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
     this.tutoradosService.getAllStudents().subscribe({
       next: (response) => {
         const tutorIdToFilter = currentUser.tutorId || currentUser.userId;
-        
+
         this.students = response.students.filter(student => {
           return student.tutorId === tutorIdToFilter;
         });
-        
+
         this.studentsFiltered = this.students;
         this.total = this.students.length;
         this.isLoading = false;
-        
+
         setTimeout(() => {
           if (this.studentsFiltered.length > 0) {
             this.animateTableRows();
@@ -167,10 +167,10 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
       const nombre = student.informacionPersonal.nombreCompleto.toLowerCase();
       const matricula = student.matricula?.toLowerCase() || '';
       const email = student.informacionPersonal.email.toLowerCase();
-      
-      return nombre.includes(this.searchTerm) || 
-             matricula.includes(this.searchTerm) || 
-             email.includes(this.searchTerm);
+
+      return nombre.includes(this.searchTerm) ||
+        matricula.includes(this.searchTerm) ||
+        email.includes(this.searchTerm);
     });
 
     setTimeout(() => {
@@ -185,7 +185,7 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
   clearSearch() {
     this.searchTerm = '';
     this.studentsFiltered = this.students;
-    
+
     const input = document.querySelector('input[type="text"]') as HTMLInputElement;
     if (input) {
       input.value = '';
@@ -197,25 +197,40 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
         ease: 'power2.inOut'
       });
     }
-    
+
     setTimeout(() => this.animateTableRows(), 50);
   }
 
   verDetalle(student: Tutorado) {
     const row = event?.target as HTMLElement;
     const tableRow = row.closest('tr');
-    
+
     if (tableRow) {
       gsap.to(tableRow, {
         backgroundColor: '#EFF6FF',
         duration: 0.3,
         yoyo: true,
         repeat: 1,
-        ease: 'power2.inOut'
+        ease: 'power2.inOut',
+        onComplete: () => {
+          const studentName = student.informacionPersonal.nombreCompleto
+            .toLowerCase()
+            .replace(/\s+/g, '-')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '');
+
+          this.router.navigate(['/dashboard/tutorado', studentName, student.studentId, 'detail']);
+        }
       });
+    } else {
+      const studentName = student.informacionPersonal.nombreCompleto
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+
+      this.router.navigate(['/dashboard/tutorado', studentName, student.studentId, 'detail']);
     }
-    
-    console.log('Ver detalle del estudiante:', student);
   }
 
   refreshStudents() {
@@ -225,7 +240,7 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
 
   onRowHover(event: MouseEvent, isEntering: boolean) {
     const row = event.currentTarget as HTMLElement;
-    
+
     if (isEntering) {
       gsap.to(row, {
         x: 5,
@@ -245,7 +260,7 @@ export class TutoradosComponent implements OnInit, AfterViewInit {
 
   onButtonHover(event: MouseEvent, isEntering: boolean) {
     const button = event.currentTarget as HTMLElement;
-    
+
     if (isEntering) {
       gsap.to(button, {
         scale: 1.1,

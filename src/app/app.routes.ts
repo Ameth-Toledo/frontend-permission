@@ -35,6 +35,7 @@ export const routes: Routes = [
         { path: 'permition/detail/:matricule/:id', component: PermitionDetailComponent },
         { path: 'tutorado/detail/:matricule', component: TutoradoDetailComponent },
         { path: 'profile/docente/:id/:name', component: PerfilTutorComponent },
+        { path: 'tutorado/:name/:id/detail', component: TutoradoDetailComponent }
     ]},
     { path: 'student', component: StudentComponent },
     { path: 'student/history', component: HistoryStudentComponent },

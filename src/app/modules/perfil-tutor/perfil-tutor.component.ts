@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TutorsService } from '../../services/tutors/tutors.service';
@@ -13,27 +13,39 @@ import { ActivatedRoute, Router } from '@angular/router';
   templateUrl: './perfil-tutor.component.html',
   styleUrl: './perfil-tutor.component.css'
 })
-export class PerfilTutorComponent implements OnInit {
+export class PerfilTutorComponent implements OnInit, AfterViewInit {
+  @ViewChild('signatureCanvas') canvasRef!: ElementRef<HTMLCanvasElement>;
+
   name: string = '';
   email: string = '';
   telefono: string = '';
   role: string = '';
   fecha_registro: string = '';
-  
+  firmaUrl: string = '';
+
   userId: number = 0;
   tutorId: number = 0;
   roleId: number = 0;
-  
+
   firstName: string = '';
   middleName: string = '';
   lastName: string = '';
   secondLastName: string = '';
-  
+
   editingField: { [key: string]: boolean } = {};
   tempValues: { [key: string]: string } = {};
-  
+
+  showSignatureModal: boolean = false;
+  isDrawing: boolean = false;
+  isCanvasEmpty: boolean = true;
+  isLoadingSignature: boolean = false;
+  signatureErrorMessage: string = '';
+  signatureSuccessMessage: string = '';
+
   isLoading: boolean = true;
   errorMessage: string = '';
+
+  private context: CanvasRenderingContext2D | null = null;
 
   constructor(
     private tutorsService: TutorsService,
@@ -41,12 +53,10 @@ export class PerfilTutorComponent implements OnInit {
     private authService: AuthService,
     private route: ActivatedRoute,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
     const tutorId = this.route.snapshot.params['id'];
-    const tutorName = this.route.snapshot.params['name'];
-
     const parsedId = Number(tutorId);
 
     if (!isNaN(parsedId) && parsedId > 0) {
@@ -54,6 +64,12 @@ export class PerfilTutorComponent implements OnInit {
     } else {
       this.errorMessage = `ID de tutor inválido: "${tutorId}"`;
       this.isLoading = false;
+    }
+  }
+
+  ngAfterViewInit(): void {
+    if (this.showSignatureModal) {
+      this.initCanvas();
     }
   }
 
@@ -69,6 +85,7 @@ export class PerfilTutorComponent implements OnInit {
         this.email = response.informacion_personal.email;
         this.telefono = response.informacion_personal.telefono;
         this.role = response.informacion_rol.nombre_rol;
+        this.firmaUrl = response.firma_url || '';
 
         const fecha = new Date(response.fecha_registro);
         this.fecha_registro = fecha.toLocaleString('es-MX', {
@@ -85,7 +102,7 @@ export class PerfilTutorComponent implements OnInit {
         this.middleName = nameParts[1] || '';
         this.lastName = nameParts[2] || '';
         this.secondLastName = nameParts[3] || '';
-        
+
         this.loadUserData();
       },
       error: (error) => {
@@ -97,30 +114,30 @@ export class PerfilTutorComponent implements OnInit {
 
   loadUserData(): void {
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (currentUser && currentUser.userId === this.userId) {
       this.roleId = 1;
       this.isLoading = false;
       return;
     }
-    
+
     this.usersService.getUserById(this.userId).subscribe({
       next: (user) => {
         const userData = Array.isArray(user) ? user[0] : user;
-        
+
         if (userData.firstName) {
           this.firstName = userData.firstName;
           this.middleName = userData.middleName || '';
           this.lastName = userData.lastName;
           this.secondLastName = userData.secondLastName || '';
         }
-        
+
         if (userData.roleId) {
           this.roleId = userData.roleId;
         } else {
           this.roleId = 1;
         }
-        
+
         this.isLoading = false;
       },
       error: (error) => {
@@ -134,15 +151,16 @@ export class PerfilTutorComponent implements OnInit {
     if (!this.firstName || !this.lastName) {
       return;
     }
-    
+
     if (!this.roleId || this.roleId === 0) {
       this.roleId = 1;
     }
-    
+
     this.editingField[field] = true;
-    this.tempValues[field] = field === 'name' ? this.name : 
-                             field === 'email' ? this.email : 
-                             field === 'phone' ? this.telefono : '';
+    this.tempValues[field] = 
+      field === 'name' ? this.name :
+      field === 'email' ? this.email :
+      field === 'phone' ? this.telefono : '';
   }
 
   cancelEdit(field: string): void {
@@ -152,15 +170,16 @@ export class PerfilTutorComponent implements OnInit {
 
   saveEdit(field: string): void {
     const newValue = this.tempValues[field]?.trim();
-    
+
     if (!newValue || newValue === '') {
       this.cancelEdit(field);
       return;
     }
 
-    const currentValue = field === 'name' ? this.name : 
-                        field === 'email' ? this.email : 
-                        field === 'phone' ? this.telefono : '';
+    const currentValue = 
+      field === 'name' ? this.name :
+      field === 'email' ? this.email :
+      field === 'phone' ? this.telefono : '';
 
     if (newValue === currentValue) {
       this.cancelEdit(field);
@@ -181,11 +200,11 @@ export class PerfilTutorComponent implements OnInit {
     if (this.middleName) {
       updateData.middleName = this.middleName;
     }
-    
+
     if (this.secondLastName) {
       updateData.secondLastName = this.secondLastName;
     }
-    
+
     if (this.telefono) {
       updateData.phone = this.telefono;
     }
@@ -194,13 +213,13 @@ export class PerfilTutorComponent implements OnInit {
       const nameParts = value.split(' ').filter(part => part.trim() !== '');
       updateData.firstName = nameParts[0] || this.firstName;
       updateData.lastName = nameParts[2] || nameParts[1] || this.lastName;
-      
+
       if (nameParts[1] && nameParts[2]) {
         updateData.middleName = nameParts[1];
       } else {
         updateData.middleName = null;
       }
-      
+
       if (nameParts[3]) {
         updateData.secondLastName = nameParts[3];
       } else {
@@ -233,9 +252,118 @@ export class PerfilTutorComponent implements OnInit {
     });
   }
 
+  openSignatureModal(): void {
+    this.showSignatureModal = true;
+    this.clearSignature();
+    
+    setTimeout(() => {
+      this.initCanvas();
+    }, 100);
+  }
+
+  closeSignatureModal(): void {
+    if (!this.isCanvasEmpty && !confirm('¿Estás seguro? Se perderá tu firma si no la guardaste.')) {
+      return;
+    }
+    this.showSignatureModal = false;
+    this.clearSignature();
+  }
+
+  private initCanvas(): void {
+    if (!this.canvasRef) return;
+
+    const canvas = this.canvasRef.nativeElement;
+    this.context = canvas.getContext('2d');
+
+    const rect = canvas.parentElement?.getBoundingClientRect();
+    if (rect) {
+      canvas.width = rect.width;
+      canvas.height = 250;
+    }
+
+    if (this.context) {
+      this.context.strokeStyle = '#1B5A85';
+      this.context.lineWidth = 2;
+      this.context.lineCap = 'round';
+      this.context.lineJoin = 'round';
+    }
+  }
+
+  startDrawing(event: MouseEvent): void {
+    if (!this.context) return;
+
+    this.isDrawing = true;
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    this.context.beginPath();
+    this.context.moveTo(x, y);
+  }
+
+  draw(event: MouseEvent): void {
+    if (!this.isDrawing || !this.context) return;
+
+    const rect = this.canvasRef.nativeElement.getBoundingClientRect();
+    const x = event.clientX - rect.left;
+    const y = event.clientY - rect.top;
+
+    this.context.lineTo(x, y);
+    this.context.stroke();
+
+    this.isCanvasEmpty = false;
+  }
+
+  stopDrawing(): void {
+    if (this.context) {
+      this.context.closePath();
+    }
+    this.isDrawing = false;
+  }
+
+  clearSignature(): void {
+    if (!this.context) return;
+
+    const canvas = this.canvasRef.nativeElement;
+    this.context.clearRect(0, 0, canvas.width, canvas.height);
+    this.isCanvasEmpty = true;
+    this.signatureErrorMessage = '';
+    this.signatureSuccessMessage = '';
+  }
+
+  saveSignature(): void {
+  if (this.isCanvasEmpty) {
+    this.signatureErrorMessage = '⚠️ Por favor, dibuja tu firma antes de guardar';
+    return;
+  }
+
+  this.isLoadingSignature = true;
+  this.signatureErrorMessage = '';
+  this.signatureSuccessMessage = '';
+
+  const signatureData = this.canvasRef.nativeElement.toDataURL('image/png');
+
+  this.tutorsService.updateTutorSignature(this.tutorId, signatureData, this.userId).subscribe({
+    next: (response) => {
+      this.isLoadingSignature = false;
+      this.signatureSuccessMessage = '✅ ¡Firma guardada correctamente!';
+      this.firmaUrl = response.firma_url || signatureData;
+
+      setTimeout(() => {
+        this.closeSignatureModal();
+      }, 2000);
+    },
+    error: (error) => {
+      this.isLoadingSignature = false;
+      this.signatureErrorMessage = error.error?.message || '❌ Error al guardar la firma. Intenta nuevamente.';
+      console.error('❌ Error al guardar firma:', error);
+    }
+  });
+}
+
   deleteAccount(): void {
     const confirmation = confirm('¿Estás seguro de que deseas eliminar tu cuenta? Esta acción no se puede deshacer.');
-    
+
     if (confirmation) {
       this.usersService.deleteUser(this.userId).subscribe({
         next: () => {

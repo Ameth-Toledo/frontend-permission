@@ -54,7 +54,7 @@
         <div class="bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
             <h2 class="text-xl font-bold text-gray-800 mb-6">Detalles del Permiso</h2>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
                 <div>
                     <label for="fecha-inicial" class="block text-sm font-semibold text-gray-800 mb-2">
                         Fecha inicial <span class="text-red-500">*</span>
@@ -67,6 +67,14 @@
                         Fecha final <span class="text-red-500">*</span>
                     </label>
                     <input type="date" id="fecha-final" [(ngModel)]="fechaFinal"
+                        class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
+                </div>
+                <div>
+                    <label for="cuatrimestre" class="block text-sm font-semibold text-gray-800 mb-2">
+                        Cuatrimestre <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" id="cuatrimestre" [(ngModel)]="cuatrimestre" min="1" max="12"
+                        placeholder="1-12"
                         class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white">
                 </div>
             </div>
@@ -108,22 +116,57 @@
             </div>
 
             <div class="mb-6">
+                <label for="descripcion" class="block text-sm font-semibold text-gray-800 mb-2">
+                    Descripción del permiso <span class="text-red-500">*</span>
+                </label>
+                <textarea id="descripcion" [(ngModel)]="descripcion" rows="4"
+                    placeholder="Describe detalladamente el motivo del permiso..."
+                    class="w-full px-4 py-2.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white resize-none"></textarea>
+                <p class="text-xs text-gray-500 mt-1">Proporciona una explicación clara y detallada del motivo del
+                    permiso.</p>
+            </div>
+
+            <div class="mb-6">
                 <label class="block text-sm font-semibold text-gray-800 mb-3">
                     Docentes a notificar <span class="text-red-500">*</span>
                 </label>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+                <div *ngIf="isLoadingDocentes" class="text-center py-8">
+                    <i class='bx bx-loader-alt bx-spin text-3xl text-blue-600'></i>
+                    <p class="mt-2 text-gray-600 text-sm">Cargando docentes...</p>
+                </div>
+
+                <div *ngIf="errorDocentes && !isLoadingDocentes" class="bg-red-50 border border-red-200 rounded-lg p-4">
+                    <div class="flex items-center gap-2">
+                        <i class='bx bx-error-circle text-red-600 text-xl'></i>
+                        <p class="text-red-700 text-sm">{{ errorDocentes }}</p>
+                    </div>
+                    <button (click)="loadDocentes()" class="mt-3 text-sm text-red-600 hover:text-red-800 font-medium">
+                        Intentar de nuevo
+                    </button>
+                </div>
+
+                <div *ngIf="!isLoadingDocentes && !errorDocentes && docentes.length > 0"
+                    class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label *ngFor="let docente of docentes"
                         class="flex items-center gap-3 px-4 py-2.5 border-2 rounded-lg cursor-pointer transition-all hover:border-blue-500 hover:bg-blue-50"
-                        [class.border-blue-500]="isDocenteSelected(docente.id)"
-                        [class.bg-blue-50]="isDocenteSelected(docente.id)"
-                        [class.border-gray-300]="!isDocenteSelected(docente.id)">
-                        <input type="checkbox" [checked]="isDocenteSelected(docente.id)"
-                            (change)="toggleDocente(docente.id)"
+                        [class.border-blue-500]="isDocenteSelected(docente.teacherId)"
+                        [class.bg-blue-50]="isDocenteSelected(docente.teacherId)"
+                        [class.border-gray-300]="!isDocenteSelected(docente.teacherId)">
+                        <input type="checkbox" [checked]="isDocenteSelected(docente.teacherId)"
+                            (change)="toggleDocente(docente.teacherId)"
                             class="w-5 h-5 text-blue-600 rounded focus:ring-2 focus:ring-blue-500">
-                        <span class="text-sm text-gray-800" [class.font-semibold]="isDocenteSelected(docente.id)">
-                            {{ docente.nombre }}
+                        <span class="text-sm text-gray-800"
+                            [class.font-semibold]="isDocenteSelected(docente.teacherId)">
+                            {{ docente.informacionPersonal.nombreCompleto }}
                         </span>
                     </label>
+                </div>
+
+                <div *ngIf="!isLoadingDocentes && !errorDocentes && docentes.length === 0"
+                    class="text-center py-8 bg-gray-50 rounded-lg">
+                    <i class='bx bx-user-x text-4xl text-gray-300'></i>
+                    <p class="mt-2 text-gray-500 text-sm">No hay docentes disponibles</p>
                 </div>
             </div>
 
@@ -133,10 +176,11 @@
                     <i class='bx bx-x text-base'></i>
                     <span>Cancelar</span>
                 </button>
-                <button type="submit" (click)="generarPermiso()"
-                    class="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm hover:shadow inline-flex items-center justify-center gap-1.5 w-auto">
-                    <i class='bx bx-check-circle text-base'></i>
-                    <span>Generar Permiso</span>
+                <button type="submit" (click)="generarPermiso()" [disabled]="isSubmitting"
+                    class="px-5 py-2 bg-blue-600 text-white text-sm font-medium rounded-md hover:bg-blue-700 active:bg-blue-800 transition-all shadow-sm hover:shadow inline-flex items-center justify-center gap-1.5 w-auto disabled:opacity-50 disabled:cursor-not-allowed">
+                    <i class='bx' [ngClass]="isSubmitting ? 'bx-loader-alt bx-spin' : 'bx-check-circle'"
+                        class="text-base"></i>
+                    <span>{{ isSubmitting ? 'Generando...' : 'Generar Permiso' }}</span>
                 </button>
             </div>
         </div>

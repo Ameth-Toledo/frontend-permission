@@ -6,11 +6,11 @@ import { TitleService } from '../../services/title/title.service';
 import { PermitionService } from '../../services/permition/permition.service';
 import { AuthService } from '../../services/auth/auth.service';
 import { Permition } from '../../models/permition';
-
+import { FormsModule } from '@angular/forms';
 @Component({
   selector: 'app-permits-student',
   standalone: true,
-  imports: [HeaderStudentComponent, CommonModule],
+  imports: [HeaderStudentComponent, CommonModule, FormsModule],
   templateUrl: './permits-student.component.html',
   styleUrl: './permits-student.component.css'
 })
@@ -24,7 +24,7 @@ export class PermitsStudentComponent implements OnInit {
     private permitionService: PermitionService,
     private authService: AuthService,
     private router: Router
-  ) {}
+  ) { }
 
   ngOnInit() {
     this.titleService.setTitle('Mis Permisos Aprobados');
@@ -33,7 +33,7 @@ export class PermitsStudentComponent implements OnInit {
 
   loadApprovedPermits() {
     const currentUser = this.authService.getCurrentUser();
-    
+
     if (!currentUser) {
       this.errorMessage = 'No hay usuario autenticado';
       this.isLoading = false;
@@ -49,10 +49,9 @@ export class PermitsStudentComponent implements OnInit {
 
     this.isLoading = true;
     this.errorMessage = '';
-    
+
     this.permitionService.getPermitsByStudent(currentUser.studentId).subscribe({
       next: (response) => {
-        // Filtrar solo los permisos aprobados
         this.approvedPermits = response.permits.filter(
           permit => permit.status.toLowerCase().trim() === 'approved'
         );
@@ -75,11 +74,9 @@ export class PermitsStudentComponent implements OnInit {
   descargarPermiso(pdfUrl: string, permitId: number) {
     if (!pdfUrl) return;
 
-    // Extraer la URL real del PDF desde el visor de PDF.js
     const urlMatch = pdfUrl.match(/file=([^&]+)/);
     const realPdfUrl = urlMatch ? decodeURIComponent(urlMatch[1]) : pdfUrl;
 
-    // Crear un enlace temporal para descargar
     const link = document.createElement('a');
     link.href = realPdfUrl;
     link.download = `Permiso_${permitId}.pdf`;
@@ -101,5 +98,61 @@ export class PermitsStudentComponent implements OnInit {
 
   irAHistorial() {
     this.router.navigate(['/student/history']);
+  }
+  currentPage: number = 1;
+  itemsPerPage: number = 10;
+  Math = Math; 
+
+  get paginatedPermits() {
+    const startIndex = (this.currentPage - 1) * this.itemsPerPage;
+    const endIndex = startIndex + this.itemsPerPage;
+    return this.approvedPermits.slice(startIndex, endIndex);
+  }
+
+  get totalPages(): number {
+    return Math.ceil(this.approvedPermits.length / this.itemsPerPage);
+  }
+
+  nextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.scrollToTop();
+    }
+  }
+
+  previousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.scrollToTop();
+    }
+  }
+
+  goToPage(page: number): void {
+    this.currentPage = page;
+    this.scrollToTop();
+  }
+
+  getPageNumbers(): number[] {
+    const pages: number[] = [];
+    const maxVisiblePages = 5;
+
+    if (this.totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= this.totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      const leftBound = Math.max(1, this.currentPage - 2);
+      const rightBound = Math.min(this.totalPages, this.currentPage + 2);
+
+      for (let i = leftBound; i <= rightBound; i++) {
+        pages.push(i);
+      }
+    }
+
+    return pages;
+  }
+
+  private scrollToTop(): void {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 }

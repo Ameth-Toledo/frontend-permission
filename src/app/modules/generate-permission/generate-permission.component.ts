@@ -3,7 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { TitleService } from '../../services/title/title.service';
+import { TeachersService } from '../../services/teachers/teachers.service';
+import { PermitionService } from '../../services/permition/permition.service';
+import { AuthService } from '../../services/auth/auth.service';
 import { Tutorado } from '../../models/tutorado';
+import { Teacher } from '../../models/teacher';
 
 @Component({
   selector: 'app-generate-permission',
@@ -14,51 +18,67 @@ import { Tutorado } from '../../models/tutorado';
 })
 export class GeneratePermissionComponent implements OnInit {
   selectedStudent: Tutorado | null = null;
-  
+
   // Datos del formulario
   fechaInicial: string = '';
   fechaFinal: string = '';
   motivo: string = 'tramites-personales';
+  descripcion: string = '';
+  cuatrimestre: number = 1;
   docentesSeleccionados: number[] = [];
-  
+
   // Archivos
   selectedFile: File | null = null;
   isDragging: boolean = false;
-  
-  // Lista de docentes (esto podría venir de un servicio)
-  docentes = [
-    { id: 1, nombre: 'Marcelo Álvarez Hernández' },
-    { id: 2, nombre: 'Sirgei Garcia Bailindas' },
-    { id: 3, nombre: 'Jose Pablo Vazquez Cruz' },
-    { id: 4, nombre: 'Diana Beatriz Vazquez Cruz' },
-    { id: 5, nombre: 'Alonso Guadalupe Hernandez Mendoza' }
-  ];
+
+  // Lista de docentes
+  docentes: Teacher[] = [];
+  isLoadingDocentes: boolean = false;
+  errorDocentes: string = '';
+
+  // Estado del envío
+  isSubmitting: boolean = false;
 
   constructor(
     private titleService: TitleService,
-    private router: Router
+    private router: Router,
+    private teachersService: TeachersService,
+    private permitionService: PermitionService,
+    private authService: AuthService
   ) { }
 
   ngOnInit() {
     this.titleService.setTitle('Generar Permiso');
-    
-    // Cargar datos del alumno seleccionado desde sessionStorage
+
     const studentData = sessionStorage.getItem('selectedStudent');
-    
+
     if (studentData) {
       this.selectedStudent = JSON.parse(studentData);
-      console.log('📋 Alumno cargado para permiso:', this.selectedStudent);
-    } else {
-      console.warn('⚠️ No hay alumno seleccionado');
     }
+
+    this.loadDocentes();
   }
 
-  // Manejo de archivos
+  loadDocentes() {
+    this.isLoadingDocentes = true;
+    this.errorDocentes = '';
+
+    this.teachersService.getAllTeachers().subscribe({
+      next: (response) => {
+        this.docentes = response.teachers;
+        this.isLoadingDocentes = false;
+      },
+      error: (error) => {
+        this.errorDocentes = 'Error al cargar la lista de docentes';
+        this.isLoadingDocentes = false;
+      }
+    });
+  }
+
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedFile = input.files[0];
-      console.log('📎 Archivo seleccionado:', this.selectedFile.name);
     }
   }
 
@@ -81,7 +101,6 @@ export class GeneratePermissionComponent implements OnInit {
 
     if (event.dataTransfer?.files && event.dataTransfer.files.length > 0) {
       this.selectedFile = event.dataTransfer.files[0];
-      console.log('📎 Archivo arrastrado:', this.selectedFile.name);
     }
   }
 
@@ -99,10 +118,7 @@ export class GeneratePermissionComponent implements OnInit {
   }
 
   cancelar() {
-    // Limpiar sessionStorage
     sessionStorage.removeItem('selectedStudent');
-    
-    // Navegar de regreso
     this.router.navigate(['/dashboard/welcome']);
   }
 
@@ -113,33 +129,119 @@ export class GeneratePermissionComponent implements OnInit {
     }
 
     if (!this.fechaInicial || !this.fechaFinal) {
-      alert('Por favor selecciona las fechas');
+      alert('Por favor selecciona las fechas inicial y final');
+      return;
+    }
+
+    if (!this.cuatrimestre || this.cuatrimestre < 1 || this.cuatrimestre > 12) {
+      alert('Por favor ingresa un cuatrimestre válido (1-12)');
+      return;
+    }
+
+    if (!this.descripcion || this.descripcion.trim() === '') {
+      alert('Por favor proporciona una descripción del permiso');
       return;
     }
 
     if (this.docentesSeleccionados.length === 0) {
-      alert('Por favor selecciona al menos un docente');
+      alert('Por favor selecciona al menos un docente a notificar');
       return;
     }
 
-    const permisoData = {
-      alumno: this.selectedStudent,
-      fechaInicial: this.fechaInicial,
-      fechaFinal: this.fechaFinal,
-      motivo: this.motivo,
-      docentes: this.docentesSeleccionados,
-      archivo: this.selectedFile ? this.selectedFile.name : null
-    };
+    const currentUser = this.authService.getCurrentUser();
+    if (!currentUser || !currentUser.tutorId) {
+      alert('Error: No se pudo identificar al tutor');
+      return;
+    }
 
-    console.log('✅ Generando permiso:', permisoData);
-    
-    // Aquí implementarías la llamada al servicio para crear el permiso
-    // this.permisosService.crearPermiso(permisoData).subscribe(...)
-    
-    alert('Permiso generado exitosamente');
-    
-    // Limpiar sessionStorage y regresar
-    sessionStorage.removeItem('selectedStudent');
-    this.router.navigate(['/dashboard/welcome']);
+    const formData = new FormData();
+
+    formData.append('studentId', this.selectedStudent.studentId.toString());
+    formData.append('tutorId', currentUser.tutorId.toString());
+    formData.append('startDate', this.fechaInicial);
+    formData.append('endDate', this.fechaFinal);
+    formData.append('reason', this.motivo);
+    formData.append('description', this.descripcion.trim());
+    formData.append('status', 'approved');
+    formData.append('cuatrimestre', this.cuatrimestre.toString());
+
+    this.docentesSeleccionados.forEach(teacherId => {
+      formData.append('teacherIds', teacherId.toString());
+    });
+
+    if (this.selectedFile) {
+      formData.append('evidence', this.selectedFile);
+    }
+
+    this.isSubmitting = true;
+
+    this.permitionService.createPermit(formData).subscribe({
+      next: (response) => {
+        const permitId = response.permit?.permitId || response.permitId;
+
+        if (permitId) {
+          this.permitionService.updatePermitStatus(permitId, 'approved').subscribe({
+            next: (approvalResponse) => {
+              this.permitionService.generatePermitDocument(permitId).subscribe({
+                next: (pdfResponse) => {
+                  alert('✅ Permiso generado, aprobado y PDF creado exitosamente.');
+
+                  sessionStorage.removeItem('selectedStudent');
+                  this.isSubmitting = false;
+                  this.router.navigate(['/dashboard/welcome']);
+                },
+                error: (pdfError) => {
+                  let pdfErrorMessage = 'Permiso creado y aprobado exitosamente, pero hubo un error al generar el PDF.';
+                  
+                  if (pdfError.error?.error) {
+                    pdfErrorMessage += `\n\nDetalle: ${pdfError.error.error}`;
+                  }
+                  
+                  alert(pdfErrorMessage + '\n\nPuedes generar el PDF manualmente desde el historial de permisos.');
+
+                  sessionStorage.removeItem('selectedStudent');
+                  this.isSubmitting = false;
+                  this.router.navigate(['/dashboard/welcome']);
+                }
+              });
+            },
+            error: (approvalError) => {
+              let approvalErrorMessage = 'El permiso fue creado, pero hubo un error al aprobarlo automáticamente.';
+              
+              if (approvalError.error?.error) {
+                approvalErrorMessage += `\n\nDetalle: ${approvalError.error.error}`;
+              }
+              
+              alert(approvalErrorMessage + '\n\nPuedes aprobar el permiso manualmente desde el historial.');
+
+              sessionStorage.removeItem('selectedStudent');
+              this.isSubmitting = false;
+              this.router.navigate(['/dashboard/welcome']);
+            }
+          });
+        } else {
+          alert('Permiso creado exitosamente, pero no se pudo obtener el ID del permiso.');
+          
+          sessionStorage.removeItem('selectedStudent');
+          this.isSubmitting = false;
+          this.router.navigate(['/dashboard/welcome']);
+        }
+      },
+      error: (error) => {
+        this.isSubmitting = false;
+
+        let errorMessage = 'Error al generar el permiso. Por favor, intenta de nuevo.';
+
+        if (error.error?.message) {
+          errorMessage = error.error.message;
+        } else if (error.error?.error) {
+          errorMessage = error.error.error;
+        } else if (error.message) {
+          errorMessage = error.message;
+        }
+
+        alert(errorMessage);
+      }
+    });
   }
 }
